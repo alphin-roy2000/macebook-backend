@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus  } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
@@ -13,7 +13,9 @@ export class UserService {
     private readonly userRepository: Repository<User>,
     // private readonly jwtService : JwtService,
   ){}
-  async createUser(data: any): Promise<any> {
+
+  // register a user
+  async register(data: any): Promise<any> {
     try {
         const { email,password } = data;
         const user = await this.userRepository.findOne({
@@ -56,4 +58,25 @@ export class UserService {
       };
     }
   }
+
+  async validateUser(email: string, password: string): Promise<any> {
+    try {
+      const user = await this.userRepository.findOne({email});
+      if (user) {
+        const match = await bcrypt.compare(password, user.password);
+        if (match) {
+          return user;
+        }
+      }
+      return null;
+    } catch (err) {
+      global.console.log('err', err);
+      return {
+        success: false,
+        message: 'Something went wrong..! Login failed.',
+      };
+    }
+  }
+
+
 }
