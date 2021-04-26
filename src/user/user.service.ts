@@ -67,8 +67,9 @@ export class UserService {
         if (match) {
           return user;
         }
+        throw new HttpException('Password incorrect', HttpStatus.UNAUTHORIZED);
       }
-      return null;
+      throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);
     } catch (err) {
       global.console.log('err', err);
       return {
@@ -78,5 +79,26 @@ export class UserService {
     }
   }
 
+   // Login 
 
+  // async login(user: any): Promise<any> {
+  //   try {
+  //     const { email, id } = user;
+  //     const payload = { email, id };
+  //     delete user.password;
+
+  //     return {
+  //       success: true,
+  //       message: 'Success',
+  //       data: user,
+  //       access_token: this.jwtService.sign(payload),
+  //     };
+  //   } catch (err) {
+  //     console.log('err', err);
+  //     return {
+  //       success: false,
+  //       message: 'Something went wrong..! Login failed.',
+  //     };
+  //   }
+  // }
 }
