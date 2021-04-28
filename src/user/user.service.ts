@@ -11,7 +11,7 @@ export class UserService {
   constructor (
     @InjectRepository (User)
     private readonly userRepository: Repository<User>,
-    // private readonly jwtService : JwtService,
+    private readonly jwtService : JwtService,
   ){}
 
   // register a user
@@ -60,8 +60,8 @@ export class UserService {
   }
 
   async validateUser(email: string, password: string): Promise<any> {
-    try {
-      const user = await this.userRepository.findOne({email});
+      const user = await this.userRepository.findOne({where:{email}});
+      global.console.log('user',user)
       if (user) {
         const match = await bcrypt.compare(password, user.password);
         if (match) {
@@ -70,35 +70,25 @@ export class UserService {
         throw new HttpException('Password incorrect', HttpStatus.UNAUTHORIZED);
       }
       throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);
+  }
+
+   //Login 
+  async login(user1: any): Promise<any> {
+    try {
+      const user = await this.validateUser(user1.email,user1.password)
+      delete user.password
+      const payload = { email: user.email };
+      return {
+        success: true,
+        message: 'Success',
+        data: user,
+        access_token: this.jwtService.sign(payload),
+      };
     } catch (err) {
-      global.console.log('err', err);
       return {
         success: false,
-        message: 'Something went wrong..! Login failed.',
+        message: err.response,
       };
     }
   }
-
-   // Login 
-
-  // async login(user: any): Promise<any> {
-  //   try {
-  //     const { email, id } = user;
-  //     const payload = { email, id };
-  //     delete user.password;
-
-  //     return {
-  //       success: true,
-  //       message: 'Success',
-  //       data: user,
-  //       access_token: this.jwtService.sign(payload),
-  //     };
-  //   } catch (err) {
-  //     console.log('err', err);
-  //     return {
-  //       success: false,
-  //       message: 'Something went wrong..! Login failed.',
-  //     };
-  //   }
-  // }
 }
