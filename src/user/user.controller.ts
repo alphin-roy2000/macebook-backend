@@ -13,7 +13,7 @@ export class UserController {
   }
 
   @Post('login')
-  login(@Body() req: LoginUserDto) {
-    return this.userService.login(req);
+  login(@Body() loginUserDto: LoginUserDto) {
+    return this.userService.login(loginUserDto);
   }
 }

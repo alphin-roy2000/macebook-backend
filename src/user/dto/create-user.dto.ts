@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 
 export class CreateUserDto {
-    @ApiProperty({ example: 'TnP MACE' })
+  @ApiProperty({ example: 'TnP MACE' })
   readonly username: string;
 
   @ApiProperty({
