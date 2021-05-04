@@ -7,7 +7,7 @@ import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const logger = new Logger('Macebook Server');
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule,{ cors: true });
   app.use(cookieParser());
   const swaggerOptions = new DocumentBuilder()
       .setTitle('Macebook Server')
