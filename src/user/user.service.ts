@@ -4,7 +4,8 @@ import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { v4 as uuidv4 } from 'uuid';
 import { Repository } from 'typeorm';
-import User from './entities/user.entity'
+import User from './entities/user.entity';
+import { jwtConstants } from '../config/constants';
 
 @Injectable()
 export class UserService {
@@ -17,18 +18,18 @@ export class UserService {
   // register a user
   async register(data: any): Promise<any> {
     try {
-        const { email,password } = data;
+        const { email } = data;
         const user = await this.userRepository.findOne({
           email: email.toLowerCase(),
         });
         if (user) {
-          if (!user.password) {
-            const hash = await bcrypt.hash(password, 10);
-            const data = {
-              password: hash,
-            };
-            await this.userRepository.update(user.id, data);
-          }
+          // if (!user.password) {
+          //   const hash = await bcrypt.hash(password, 10);
+          //   const data = {
+          //     password: hash,
+          //   };
+          //   await this.userRepository.update(user.id, data);
+          // } unncessaty code delete later
           return {
             success: false,
             message: 'User Exist',
@@ -59,7 +60,7 @@ export class UserService {
     }
   }
 
-  async validateUser(email: string, password: string): Promise<any> {
+  public async validateUser(email: string, password: string): Promise<any> {
       const user = await this.userRepository.findOne({where:{email}});
       if (user) {
         const match = await bcrypt.compare(password, user.password);
@@ -72,22 +73,12 @@ export class UserService {
   }
 
    //Login 
-  async login(user1: any): Promise<any> {
-    try {
-      const user = await this.validateUser(user1.email,user1.password)
-      delete user.password
-      const payload = { email: user.email };
-      return {
-        success: true,
-        message: 'Success',
-        data: user,
-        access_token: this.jwtService.sign(payload),
-      };
-    } catch (err) {
-      return {
-        success: false,
-        message: err.response,
-      };
-    }
+  login(user1: any){
+    
+      delete user1.password
+      const payload = { email: user1.email };
+      const accessToken = this.jwtService.sign(payload);
+      return `Authentication=${accessToken}; HttpOnly; Path=/; Max-Age=${jwtConstants.expiresin}`;
+    
   }
 }
