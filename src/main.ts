@@ -3,13 +3,14 @@ import { AppModule } from './app.module';
 import { Logger} from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { config } from 'dotenv';
+import * as cookieParser from 'cookie-parser';
 
 config();
 
 async function bootstrap() {
   const logger = new Logger('Macebook Server');
   const app = await NestFactory.create(AppModule);
-
+  app.use(cookieParser());
   const swaggerOptions = new DocumentBuilder()
       .setTitle('Macebook Server')
       .setDescription('TnP MACE')
