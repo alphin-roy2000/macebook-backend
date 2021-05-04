@@ -23,13 +23,6 @@ export class UserService {
           email: email.toLowerCase(),
         });
         if (user) {
-          // if (!user.password) {
-          //   const hash = await bcrypt.hash(password, 10);
-          //   const data = {
-          //     password: hash,
-          //   };
-          //   await this.userRepository.update(user.id, data);
-          // } unncessaty code delete later
           return {
             success: false,
             message: 'User Exist',
@@ -50,7 +43,6 @@ export class UserService {
             data: result,
           };
         }
-
     } catch (err) {
       console.log('err', err);
       return {
@@ -73,12 +65,15 @@ export class UserService {
   }
 
    //Login 
-  login(user1: any){
-    
+  public login(user1: any){ 
       delete user1.password
       const payload = { email: user1.email };
       const accessToken = this.jwtService.sign(payload);
-      return `Authentication=${accessToken}; HttpOnly; Path=/; Max-Age=${jwtConstants.expiresin}`;
-    
+      return `Authentication=${accessToken}; HttpOnly; Path=/; Max-Age=${jwtConstants.expiresin}`;  
+  }
+
+  //logout
+  public getCookieForLogOut() {
+    return `Authentication=; HttpOnly; Path=/; Max-Age=0`;
   }
 }

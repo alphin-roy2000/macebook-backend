@@ -26,4 +26,11 @@ export class UserController {
     return request.user
   }
 
+  @UseGuards(jwtAuthenticationGuard)
+  @Post('logout')
+  async logOut(@Req() request: RequestWithUser, @Res() response: Response) {
+    response.setHeader('Set-Cookie', this.userService.getCookieForLogOut());
+    return response.sendStatus(200);
+  }
+
 }
