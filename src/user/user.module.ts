@@ -6,6 +6,7 @@ import  User  from './entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import {JwtStrategy} from './strategies/jwt.strategy'
+import { LocalStrategy } from './strategies/local.strategy';
 
 @Module({
   imports: [TypeOrmModule.forFeature([ User ]), 
@@ -18,6 +19,6 @@ import {JwtStrategy} from './strategies/jwt.strategy'
 }),
   ],
   controllers: [UserController],
-  providers: [UserService,JwtStrategy]
+  providers: [UserService,JwtStrategy,LocalStrategy]
 })
 export class UserModule {}
