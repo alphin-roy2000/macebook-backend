@@ -28,7 +28,8 @@ export class UserService {
             success: false,
             message: 'User already exist, please login.',
           }
-        } else if (await this.userRepository.findOne({username: username.toLowerCase()})){
+        }
+        if (await this.userRepository.findOne({username: username.toLowerCase()})){
           return {
             success: false,
             message: 'Username already taken'
@@ -103,6 +104,12 @@ export class UserService {
     } catch (err){
       throw err;
     }
+  }
+
+  //edit username
+  public async editUsername(uid: string, username: string){
+    
+
   }
 
 }
