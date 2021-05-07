@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from './config/dbConfig';
 import { UserModule } from './user/user.module';
+import { JobsModule } from './jobs/jobs.module';
 
 
 
@@ -8,6 +9,7 @@ import { UserModule } from './user/user.module';
   imports: [
     ConfigModule.forRoot(),
     UserModule,
+    JobsModule,
   ],
   controllers: [],
   providers: [],
