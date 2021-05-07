@@ -19,18 +19,20 @@ export class UserService {
   // register a user
   async register(data: any): Promise<any> {
     try {
-        const { email } = data;
+        const { email, username } = data;
         const user = await this.userRepository.findOne({
           email: email.toLowerCase(),
         });
         if (user) {
           return {
             success: false,
-            message: 'User Exist',
-            data: {
-              email: 'User already exist, please login.',
-            },
-          };
+            message: 'User already exist, please login.',
+          }
+        } else if (await this.userRepository.findOne({username: username.toLowerCase()})){
+          return {
+            success: false,
+            message: 'Username already taken'
+          }
         } else {
           data.password = await bcrypt.hash(data.password, 10);
           data.status = 'ACTIVE';
