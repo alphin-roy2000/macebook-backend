@@ -3,10 +3,12 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Request } from 'express';
 import { jwtConstants } from '../../config/constants';
+import { UserService } from '../user.service';
+import { JwtPayload } from '../interfaces/payload.interface';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor() {
+  constructor(private userService: UserService) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
         return request?.cookies?.Authentication;
@@ -16,7 +18,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: any) {
-    return { email: payload.email };
+  async validate(payload: JwtPayload) {
+    const {email} = payload;
+    return await this.userService.validateUserJwt(email);
   }
 }
