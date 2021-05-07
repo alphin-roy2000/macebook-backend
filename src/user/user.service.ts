@@ -1,14 +1,15 @@
-import { Injectable, HttpException, HttpStatus  } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus,Logger  } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { v4 as uuidv4 } from 'uuid';
-import { Repository } from 'typeorm';
+import { Repository, DeleteResult } from 'typeorm';
 import User from './entities/user.entity';
 import { jwtConstants } from '../config/constants';
 
 @Injectable()
 export class UserService {
+  private logger = new Logger(UserService.name);
   constructor (
     @InjectRepository (User)
     private readonly userRepository: Repository<User>,
@@ -64,6 +65,13 @@ export class UserService {
       throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);
   }
 
+  public async validateUserJwt(email: string): Promise<any> {
+    const user = await this.userRepository.findOne({where:{email}});
+    if (user) 
+        return user;
+    throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+  }
+
    //Login 
   public login(user1: any){ 
       delete user1.password
@@ -76,4 +84,23 @@ export class UserService {
   public getCookieForLogOut() {
     return `Authentication=; HttpOnly; Path=/; Max-Age=0`;
   }
+
+  //delete account 
+  public async deleteUser(uid : string, password: string) :  Promise<any>  {
+    try{
+      const userToDelete = await this.userRepository.findOne({where:{uid}})
+      if (await bcrypt.compare(password,userToDelete.password)){
+        return await this.userRepository
+          .createQueryBuilder()
+          .delete()
+          .from(User)
+          .where('uid = :uid',{ uid})
+          .execute();
+      }
+      throw new HttpException('Password incorrect', HttpStatus.UNAUTHORIZED);
+    } catch (err){
+      throw err;
+    }
+  }
+
 }
