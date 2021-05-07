@@ -46,6 +46,14 @@ export class UserController {
   }
 
   @UseGuards(jwtAuthenticationGuard)
+  @Patch('edit-username')
+  async editUsername(@Body() body, @Req() req: RequestWithUser){
+    const {uid} = req.user;
+    const {username} = body;
+    return await this.userService.editUsername(uid,username)
+  }
+
+  @UseGuards(jwtAuthenticationGuard)
   @Get()
   authenticate(@Req() request: RequestWithUser) {
     const user = request.user;

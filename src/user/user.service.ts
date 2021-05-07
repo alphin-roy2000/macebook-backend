@@ -108,8 +108,12 @@ export class UserService {
 
   //edit username
   public async editUsername(uid: string, username: string){
-    
-
+    return await this.userRepository
+      .createQueryBuilder()
+      .update(User)
+      .set({username : username})
+      .where('uid = :uid',{ uid})
+      .execute()
   }
 
 }
