@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Repository, DeleteResult } from 'typeorm';
 import User from './entities/user.entity';
 import { jwtConstants } from '../config/constants';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Injectable()
 export class UserService {
@@ -114,6 +115,23 @@ export class UserService {
       .set({username : username})
       .where('uid = :uid',{ uid})
       .execute()
+  }
+
+  public async changePassword (email : string, data : ChangePasswordDto){
+    try{
+    const user = await this.validateUser(email,data.currentPassword)
+    if (user){
+      return await this.userRepository
+          .createQueryBuilder()
+          .update(User)
+          .set({password : await bcrypt.hash(data.password, 10)})
+          .where('email = :email',{email})
+          .execute();
+    }
+    } catch (err){
+      throw err;
+    }
+
   }
 
 }

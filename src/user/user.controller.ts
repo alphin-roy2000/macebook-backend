@@ -7,6 +7,7 @@ import jwtAuthenticationGuard from './guards/jwt-auth.guard'
 import localAuthenticationGuard from './guards/local-auth.guard'
 import { Response } from 'express';
 import RequestWithUser from './interfaces/requestWithUser.interface';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Controller('api/v1/auth')
 export class UserController {
@@ -51,6 +52,17 @@ export class UserController {
     const {uid} = req.user;
     const {username} = body;
     return await this.userService.editUsername(uid,username)
+  }
+
+  @UseGuards(jwtAuthenticationGuard)
+  @Patch('change-password')
+  async changePass(@Body() changePasswordDto: ChangePasswordDto, @Req() req: RequestWithUser){
+    try{
+    const {email} = req.user;
+    return await this.userService.changePassword(email,changePasswordDto)
+    } catch (err){
+      throw err
+    }
   }
 
   @UseGuards(jwtAuthenticationGuard)
