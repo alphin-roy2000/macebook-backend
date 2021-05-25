@@ -1,13 +1,16 @@
-import { Injectable, HttpException, HttpStatus  } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus,Logger  } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { v4 as uuidv4 } from 'uuid';
-import { Repository } from 'typeorm';
-import User from './entities/user.entity'
+import { Repository, DeleteResult } from 'typeorm';
+import User from './entities/user.entity';
+import { jwtConstants } from '../config/constants';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Injectable()
 export class UserService {
+  private logger = new Logger(UserService.name);
   constructor (
     @InjectRepository (User)
     private readonly userRepository: Repository<User>,
@@ -17,25 +20,21 @@ export class UserService {
   // register a user
   async register(data: any): Promise<any> {
     try {
-        const { email,password } = data;
+        const { email, username } = data;
         const user = await this.userRepository.findOne({
           email: email.toLowerCase(),
         });
         if (user) {
-          if (!user.password) {
-            const hash = await bcrypt.hash(password, 10);
-            const data = {
-              password: hash,
-            };
-            await this.userRepository.update(user.id, data);
-          }
           return {
             success: false,
-            message: 'User Exist',
-            data: {
-              email: 'User already exist, please login.',
-            },
-          };
+            message: 'User already exist, please login.',
+          }
+        }
+        if (await this.userRepository.findOne({username: username.toLowerCase()})){
+          return {
+            success: false,
+            message: 'Username already taken'
+          }
         } else {
           data.password = await bcrypt.hash(data.password, 10);
           data.status = 'ACTIVE';
@@ -49,7 +48,6 @@ export class UserService {
             data: result,
           };
         }
-
     } catch (err) {
       console.log('err', err);
       return {
@@ -59,7 +57,7 @@ export class UserService {
     }
   }
 
-  async validateUser(email: string, password: string): Promise<any> {
+  public async validateUser(email: string, password: string): Promise<any> {
       const user = await this.userRepository.findOne({where:{email}});
       if (user) {
         const match = await bcrypt.compare(password, user.password);
@@ -71,23 +69,69 @@ export class UserService {
       throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);
   }
 
+  public async validateUserJwt(email: string): Promise<any> {
+    const user = await this.userRepository.findOne({where:{email}});
+    if (user) 
+        return user;
+    throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+  }
+
    //Login 
-  async login(user1: any): Promise<any> {
-    try {
-      const user = await this.validateUser(user1.email,user1.password)
-      delete user.password
-      const payload = { email: user.email };
-      return {
-        success: true,
-        message: 'Success',
-        data: user,
-        access_token: this.jwtService.sign(payload),
-      };
-    } catch (err) {
-      return {
-        success: false,
-        message: err.response,
-      };
+  public login(user1: any){ 
+      delete user1.password
+      const payload = { email: user1.email };
+      const accessToken = this.jwtService.sign(payload);
+      return `Authentication=${accessToken}; HttpOnly; Path=/; Max-Age=${jwtConstants.expiresin}`;  
+  }
+
+  //logout
+  public getCookieForLogOut() {
+    return `Authentication=; HttpOnly; Path=/; Max-Age=0`;
+  }
+
+  //delete account 
+  public async deleteUser(uid : string, password: string) :  Promise<any>  {
+    try{
+      const userToDelete = await this.userRepository.findOne({where:{uid}})
+      if (await bcrypt.compare(password,userToDelete.password)){
+        return await this.userRepository
+          .createQueryBuilder()
+          .delete()
+          .from(User)
+          .where('uid = :uid',{ uid})
+          .execute();
+      }
+      throw new HttpException('Password incorrect', HttpStatus.UNAUTHORIZED);
+    } catch (err){
+      throw err;
     }
   }
+
+  //edit username
+  public async editUsername(uid: string, username: string){
+    return await this.userRepository
+      .createQueryBuilder()
+      .update(User)
+      .set({username : username})
+      .where('uid = :uid',{ uid})
+      .execute()
+  }
+
+  public async changePassword (email : string, data : ChangePasswordDto){
+    try{
+    const user = await this.validateUser(email,data.currentPassword)
+    if (user){
+      return await this.userRepository
+          .createQueryBuilder()
+          .update(User)
+          .set({password : await bcrypt.hash(data.password, 10)})
+          .where('email = :email',{email})
+          .execute();
+    }
+    } catch (err){
+      throw err;
+    }
+
+  }
+
 }

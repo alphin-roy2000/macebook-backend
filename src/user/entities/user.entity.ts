@@ -14,10 +14,10 @@ import {
     @Column()
     uid: string;
 
-    @Column()
+    @Column({unique:true})
     username: string;
   
-    @Column({ length: 128 })
+    @Column({ length: 128, unique:true })
     email: string;
   
     @Column({ length: 128 })
