@@ -6,18 +6,20 @@ import  User  from './entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import {JwtStrategy} from './strategies/jwt.strategy'
+import { LocalStrategy } from './strategies/local.strategy';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ User ]), 
-  PassportModule,
-  JwtModule.register({
-  secret: process.env.JWT_SECRET,
-  signOptions: {
-    expiresIn: process.env.EXPIRESIN,
-  },
-}),
+  imports:[
+    TypeOrmModule.forFeature([ User ]), 
+    PassportModule,
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      signOptions:{
+        expiresIn: process.env.EXPIRESIN,
+      },
+    }),
   ],
   controllers: [UserController],
-  providers: [UserService,JwtStrategy]
+  providers: [UserService,JwtStrategy,LocalStrategy]
 })
 export class UserModule {}
