@@ -29,5 +29,4 @@ export class ProfileController {
     DeleteProfile(@Param() profile_id:string):Promise<any> { 
         return this.profileService.deleteprofile(profile_id) 
     }
-
 }

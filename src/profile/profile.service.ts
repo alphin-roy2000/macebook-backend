@@ -67,7 +67,7 @@ export class ProfileService {
   }
   async deleteprofile(profile_id: string): Promise<any> {
     try {
-
+      console.log(profile_id);
       await this.profileRepository.delete(profile_id)
       return {
         success: true,
