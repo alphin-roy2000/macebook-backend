@@ -26,9 +26,15 @@ export class PostsService {
    async insertpost(data:any):Promise<any>{
        console.log(data)
        try{
+           const post=new Posts();
            console.log(data);
            data.post_id=uuidv4();
-           await this.postrepository.save(data);
+           post.post_id=data.post_id;
+           post.topic=data.topic;
+           post.likes=[];
+           post.text=data.text;
+           
+           await this.postrepository.save(post);
 
            return{
                success:true,
@@ -79,6 +85,23 @@ export class PostsService {
                message:'post is not deleted'
            }
        }
+   }
+
+   async likepost(post_id:string,user_id:string):Promise<any>{
+       try{
+           const post=await this.getsinglepost(user_id)
+           if(post.likes.some(like => like === user_id)){
+                post.likes.splice(post.likes.indexof(user_id),1);
+                return await this.postrepository.save(post)
+           }
+           else{
+               post.likes.push(user_id);
+               return await this.postrepository.save(post);
+           }
+       }catch(err){
+           throw(err)
+       }
+
    }
 
 }

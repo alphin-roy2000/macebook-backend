@@ -1,4 +1,4 @@
-import { Body, Controller, Get ,Param, Post, Patch, Delete} from '@nestjs/common';
+import { Body, Controller, Get ,Param, Post, Patch, Delete,Req} from '@nestjs/common';
 import {PostsService} from './posts.service';
 import { PostsDto } from './dto/create-post.dto'
 
@@ -30,6 +30,12 @@ export class PostsController {
     @Delete('/:post_id')
     DeletePost(@Param() post_id:string):Promise<any>{
         return this.postservice.deletepost(post_id)
+    }
+
+    @Post('/like:id')
+    likepost(@Req() req,@Param() params):Promise<any>{
+        return this.postservice.likepost(params.id,req.user.id);
+
     }
 
 }

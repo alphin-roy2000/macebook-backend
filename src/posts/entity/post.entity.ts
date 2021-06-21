@@ -23,5 +23,7 @@ export class Posts {
     @Column({ length:512 })
     text:string;
 
+    @Column({ type: 'simple-array' })
+    likes: string[];
     
 }
