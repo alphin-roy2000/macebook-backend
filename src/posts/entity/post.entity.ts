@@ -5,13 +5,16 @@ import {
     UpdateDateColumn,
     Unique,
     PrimaryColumn,
-    PrimaryGeneratedColumn
+    PrimaryGeneratedColumn,
+    OneToMany,
+    JoinColumn
 
 } from 'typeorm';
+import  {Comments}  from './comment.entity';
 
 @Entity('Posts')
 export class Posts {
-    @PrimaryGeneratedColumn()
+    @PrimaryColumn()
     post_id:string;
 
     @CreateDateColumn()
@@ -26,4 +29,7 @@ export class Posts {
     @Column({ type: 'simple-array' })
     likes: string[];
     
+    // COMMENT- ALPHIN ROY
+    @OneToMany(() => Comments, (comments) => comments.post, {onUpdate: 'CASCADE',onDelete:'CASCADE'})
+    comments: Comments[];
 }

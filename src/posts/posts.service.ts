@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Comments } from './entity/comment.entity';
 import { Posts } from './entity/post.entity';
 import { v4 as uuidv4 } from 'uuid'
 
@@ -9,7 +10,10 @@ export class PostsService {
     constructor(
         @InjectRepository(Posts)
         private readonly postrepository:Repository<Posts>,
-    ){}
+        @InjectRepository(Comments)
+        private readonly commentrepository:Repository<Comments>,
+        
+        ){}
 
    async getallposts():Promise<any>{
        const posts=this.postrepository.find();
@@ -103,5 +107,126 @@ export class PostsService {
        }
 
    }
+
+   // <<<<<<<<<<<<<<<<<< COMMENTS - ALPHIN ROY >>>>>>>>>>>>>>>>>>>>>>>
+   async getallcommentswithpostdetails(post_id:string):Promise<any>{
+
+    try{
+        var post =await this.postrepository.findOne(post_id,{relations:['comments']})
+    //  var comments=await this.commentrepository.find({where:{post}})
+    
+    return{
+        post
+    };
+ }catch(err){
+     console.log('err',err);
+     return{
+         success:false,
+         message:'comment not obtained'
+     };
+    }}
+   
+   async getallcomments(post_id:string):Promise<any>{
+
+    try{
+        var post =await this.postrepository.findOne(post_id)
+     var comments=await this.commentrepository.find({where:{post}})
+    
+    return{
+        comment:comments
+    };
+ }catch(err){
+     console.log('err',err);
+     return{
+         success:false,
+         message:'comment not obtained'
+     };
+    }}
+  
+  
+   async addcomment(post_id:string,data:any):Promise<any>{
+
+
+    try{
+        const post=await this.postrepository.findOne(post_id)
+       
+       if(post!=null){ const comment =new Comments()
+        comment.comment_id=uuidv4();
+        comment.user_id=data.user_id;
+        comment.post=post;
+        comment.body=data.body;
+        console.log(comment)
+      await this.commentrepository.save(comment);
+    
+    return{
+        success:true,
+        message:'Comment is added'
+    };}
+    else{
+        return{
+            success:false,
+            message:'No such post exist'
+        };
+    }
+ }catch(err){
+     console.log('err',err);
+     return{
+         success:false,
+         message:'comment is not added'
+     };
+    }}
+    
+    async updatecomment(comment_id:string,data:any):Promise<any>{
+        try{
+            console.log(data.body);
+            console.log(comment_id)
+            
+           
+            const result=await this.commentrepository.createQueryBuilder('s').update(Comments).set({body: data.body}).where(comment_id).execute();
+            console.log(result)
+            if(result?.affected !==1){
+                return{
+                    success:false,
+                    message:'comment is not updated 1'
+                }
+            }
+            else{
+                return{
+                    success:true,
+                    message:'comment is updated'
+                }
+            }
+            
+        }catch(err){
+            return{
+                success:false,
+                message:'comment is not updated'
+            }
+        }}
+   async deletecomment(comment_id:string):Promise<any>{
+    try{
+        const result=await this.commentrepository.createQueryBuilder('e').delete().where('comment_id = :comment_id' ,{comment_id}).execute();
+        console.log(result)
+        if(result?.affected !==1){
+            throw new NotFoundException();
+        }
+        else{
+            return{
+                success:true,
+                message:'comment is deleted'
+            }
+        }
+        
+    }catch(err){
+        return{
+            success:false,
+            message:'comment is not deleted'
+        }
+    }
+}
+
+
+// <<<<<<<<<<<<<<<<<<----------------------->>>>>>>>>>>>>>>>>>>>>>>
+
 
 }

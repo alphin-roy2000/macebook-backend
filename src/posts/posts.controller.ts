@@ -37,6 +37,32 @@ export class PostsController {
         return this.postservice.likepost(params.id,req.user.id);
 
     }
+// <<<<<<<<<<<<<<<<<< COMMENTS - ALPHIN ROY >>>>>>>>>>>>>>>>>>>>>>>
+@Get(':post_id/postandcomment')
+getAllCommentswithPost(@Param() post_id:string):Promise<any>{
+    return this.postservice.getallcommentswithpostdetails(post_id);
+}
+@Get(':post_id/comments')
+getAllComments(@Param() post_id:string):Promise<any>{
+    return this.postservice.getallcomments(post_id);
+}
 
+@Post(':post_id/comments')
+postcomment(@Param() post_id:string,@Body() data):Promise<any>{
+    return this.postservice.addcomment(post_id,data);
+}
+
+@Patch('update_comment/:comment_id')
+updatecomments(@Param() comment_id:string,@Body() data:any):Promise<any>{
+    return this.postservice.updatecomment(comment_id,data);
+}
+
+@Delete('comments/:comment_id')
+delete(@Param() params):Promise<any>{
+    const {post_id,comment_id} = params;
+    return this.postservice.deletecomment(comment_id);
+}
+
+// <<<<<<<<<<<<<<<<<<----------------------->>>>>>>>>>>>>>>>>>>>>>>
 }
 
