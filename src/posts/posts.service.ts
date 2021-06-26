@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Comments } from './entity/comment.entity';
 import { Posts } from './entity/post.entity';
 import { v4 as uuidv4 } from 'uuid'
+import User from 'src/user/entities/user.entity';
 
 @Injectable()
 export class PostsService {
@@ -12,7 +13,9 @@ export class PostsService {
         private readonly postrepository:Repository<Posts>,
         @InjectRepository(Comments)
         private readonly commentrepository:Repository<Comments>,
-        
+        @InjectRepository(User)
+        private readonly userrepository:Repository<User>,
+   
         ){}
 
    async getallposts():Promise<any>{
@@ -125,7 +128,23 @@ export class PostsService {
          message:'comment not obtained'
      };
     }}
-   
+    async getallpostswithcommentscount():Promise<any>{
+
+        try{
+            // var post =await this.postrepository.createQueryBuilder("post").leftJoinAndSelect("post.comments","Comments").getMany()
+            var post =await this.postrepository.createQueryBuilder("post").loadRelationCountAndMap('post.commentsCount', 'post.comments').getMany()
+
+        //  var comments=await this.commentrepository.find({where:{post}})
+        
+        return post
+    
+     }catch(err){
+         console.log('err',err);
+         return{
+             success:false,
+             message:'comment not obtained'
+         };
+        }}
    async getallcomments(post_id:string):Promise<any>{
 
     try{
@@ -152,7 +171,7 @@ export class PostsService {
        
        if(post!=null){ const comment =new Comments()
         comment.comment_id=uuidv4();
-        comment.user_id=data.user_id;
+        comment.user_id=data.user_id//;;;;;;; some changes with user comment
         comment.post=post;
         comment.body=data.body;
         console.log(comment)

@@ -30,6 +30,6 @@ export class Posts {
     likes: string[];
     
     // COMMENT- ALPHIN ROY
-    @OneToMany(() => Comments, (comments) => comments.post, {onUpdate: 'CASCADE',onDelete:'CASCADE'})
+    @OneToMany(() => Comments, (comments) => comments.post)
     comments: Comments[];
 }

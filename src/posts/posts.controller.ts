@@ -40,6 +40,7 @@ export class PostsController {
 // <<<<<<<<<<<<<<<<<< COMMENTS - ALPHIN ROY >>>>>>>>>>>>>>>>>>>>>>>
 @Get(':post_id/postandcomment')
 getAllCommentswithPost(@Param() post_id:string):Promise<any>{
+    
     return this.postservice.getallcommentswithpostdetails(post_id);
 }
 @Get(':post_id/comments')
@@ -47,6 +48,12 @@ getAllComments(@Param() post_id:string):Promise<any>{
     return this.postservice.getallcomments(post_id);
 }
 
+@Get('getposts/withcommentscount')
+getAllpostwithCommentcounts(@Param() post_id:string):Promise<any>{
+    console.log("hi")
+
+    return this.postservice.getallpostswithcommentscount();
+}
 @Post(':post_id/comments')
 postcomment(@Param() post_id:string,@Body() data):Promise<any>{
     return this.postservice.addcomment(post_id,data);

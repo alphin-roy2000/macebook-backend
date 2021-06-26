@@ -1,9 +1,12 @@
+import Comment from 'src/comments/entities/comment.entity';
+import { Comments } from 'src/posts/entity/comment.entity';
 import {
     Entity,
     Column,
     PrimaryGeneratedColumn,
     CreateDateColumn,
     Unique,
+    OneToMany,
   } from 'typeorm';
   @Entity('User')
   @Unique(['email'])
@@ -28,5 +31,7 @@ import {
   
     @CreateDateColumn()
     createdAt: Date;
-  
+    
+    // @OneToMany(()=>Comments, (comment)=>comment.user)
+    // comments:Comments[]
   }
