@@ -4,6 +4,8 @@ import { CommentsDto } from './dto/comment.dto';
 
 //POST USER AND COMMENTS are connected
 
+
+
 @Controller("api/v1/comments")
 export class CommentsController {
   constructor(private readonly commentService: CommentsService) {
@@ -46,4 +48,5 @@ delete(@Param() comment_id):Promise<any>{
     
     return this.commentService.deletecomment(comment_id);
 }
+
 }
