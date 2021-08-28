@@ -1,5 +1,4 @@
-import Comment from 'src/comments/entities/comment.entity';
-import { Comments } from 'src/posts/entity/comment.entity';
+import { Comments } from 'src/comments/entities/comment.entity';
 import {
     Entity,
     Column,
@@ -32,6 +31,6 @@ import {
     @CreateDateColumn()
     createdAt: Date;
     
-    // @OneToMany(()=>Comments, (comment)=>comment.user)
-    // comments:Comments[]
+    @OneToMany(()=>Comments, (comment)=>comment.user)
+    comments:Comments[]
   }

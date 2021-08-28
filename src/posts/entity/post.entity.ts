@@ -1,3 +1,4 @@
+import { Comments } from 'src/comments/entities/comment.entity';
 import {
     Entity,
     Column,
@@ -6,11 +7,9 @@ import {
     Unique,
     PrimaryColumn,
     PrimaryGeneratedColumn,
-    OneToMany,
-    JoinColumn
+    OneToMany
 
 } from 'typeorm';
-import  {Comments}  from './comment.entity';
 
 @Entity('Posts')
 export class Posts {
@@ -28,8 +27,10 @@ export class Posts {
 
     @Column({ type: 'simple-array' })
     likes: string[];
-    
-    // COMMENT- ALPHIN ROY
+
+
+    //Post-Comment(AR)
     @OneToMany(() => Comments, (comments) => comments.post)
     comments: Comments[];
+
 }

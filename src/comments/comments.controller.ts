@@ -2,31 +2,51 @@ import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/commo
 import { CommentsService } from './comments.services';
 import { CommentsDto } from './dto/comment.dto';
 
+//POST USER AND COMMENTS are connected
 
 
-@Controller("api/v1/comment")
+
+@Controller("api/v1/comments")
 export class CommentsController {
   constructor(private readonly commentService: CommentsService) {
   }
-  @Get('/:postid')
-  commentsofpostid(@Param() postid: string): Promise<any> {
-    console.log(postid)
-    return this.commentService.getcomments(postid)
-  }
+  @Get('p1/:post_id')//Post with comments
+getpostandcomment(@Param() post_id:string):Promise<any>{
+    
+    return this.commentService.getpostandcomments(post_id);
+}
+@Get('p/:post_id')//Get comments only for post_id
+getAllComments(@Param() post_id:string):Promise<any>{
+    return this.commentService.getcommentsofpost(post_id);
+}
 
-  @Post('save')
-  insert(@Body() commentDto: CommentsDto): Promise<any> {
-    return this.commentService.insertcomment(commentDto);
-  }
-  @Patch('edit')
-  update(@Body() commentDto: CommentsDto): Promise<any> {
-    console.log(commentDto)
-    return this.commentService.updatecomment(commentDto);
-  }
-  @Delete('/:commentid')
-  delete(@Param() commentid: string): Promise<any> {
-    console.log(commentid)
+@Get('p2')//Get post with counts of comments
+getAllpostwithCommentcounts(@Param() post_id:string):Promise<any>{
 
-    return this.commentService.deletecomment(commentid);
-  }
+
+    return this.commentService.getpostsandcommentscount();
+}
+
+@Get('p3')//NOT COMPLETE-----Get post with some comments like the instagram post ui 
+getAllpostwithSomeComments(@Param() post_id:string):Promise<any>{
+
+
+    return this.commentService.getpostsandsomecomments();
+}
+@Post(':post_id')// Post comments
+postcomment(@Param() post_id:string,@Body() data):Promise<any>{
+    return this.commentService.insertcomment(post_id,data);
+}
+
+@Patch(':comment_id')// Update comment
+updatecomments(@Param() comment_id:string,@Body() data:any):Promise<any>{
+    return this.commentService.updatecomment(comment_id,data);
+}
+
+@Delete(':comment_id')//Delete comment with id
+delete(@Param() comment_id):Promise<any>{
+    
+    return this.commentService.deletecomment(comment_id);
+}
+
 }
