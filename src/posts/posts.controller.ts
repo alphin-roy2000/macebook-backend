@@ -1,6 +1,9 @@
-import { Body, Controller, Get ,Param, Post, Patch, Delete,Req} from '@nestjs/common';
+import { Body, Controller, Get ,Param, Post, Patch, Delete,Req, Query} from '@nestjs/common';
 import {PostsService} from './posts.service';
 import { PostsDto } from './dto/create-post.dto'
+import { UpdatePostDto } from './dto/update-post.dto';
+import { GetPostByTopic } from './dto/get-post-by-topic.dto';
+
 
 @Controller('api/v1/posts')
 export class PostsController {
@@ -8,8 +11,18 @@ export class PostsController {
     }
 
     @Get()
-    FindPosts():Promise<any>{
-        return this.postservice.getallposts()
+    getallposts():Promise<any>{
+        return this.postservice.getallposts();
+    }
+
+    @Get('/search')
+    searchpost(@Query() topicdto:GetPostByTopic):Promise<any>{
+        return this.postservice.searchpost(topicdto)
+    }
+
+    @Get('/topic')
+    getpostbytopic(@Query() topicdto:GetPostByTopic):Promise<any>{
+        return this.postservice.getpostbytopic(topicdto)
     }
 
     @Get('/:post_id')
@@ -22,9 +35,9 @@ export class PostsController {
         return this.postservice.insertpost(postdto)
     }
 
-    @Patch('/update_post')
-    UpdatePost(@Body() postdto:PostsDto):Promise<any>{
-        return this.postservice.updatepost(postdto)
+    @Patch('/:post_id/update_post')
+    UpdatePost(@Param('post_id') post_id:string,@Body() updatepostdto:UpdatePostDto):Promise<any>{
+        return this.postservice.updatepost(post_id,updatepostdto)
     }
 
     @Delete('/:post_id')
@@ -37,6 +50,11 @@ export class PostsController {
         return this.postservice.likepost(params.id,req.user.id);
 
     }
+
+   
+    
+
+    
 
 }
 
