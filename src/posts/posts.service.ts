@@ -4,7 +4,10 @@ import { Repository } from 'typeorm';
 import { Comments } from './entity/comment.entity';
 import { Posts } from './entity/post.entity';
 import { v4 as uuidv4 } from 'uuid'
-import User from 'src/user/entities/user.entity';
+import { PostsDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
+import { GetPostByTopic } from './dto/get-post-by-topic.dto';
+
 
 @Injectable()
 export class PostsService {
@@ -13,57 +16,97 @@ export class PostsService {
         private readonly postrepository:Repository<Posts>,
         @InjectRepository(Comments)
         private readonly commentrepository:Repository<Comments>,
-        @InjectRepository(User)
-        private readonly userrepository:Repository<User>,
+
    
         ){}
 
-   async getallposts():Promise<any>{
-       const posts=this.postrepository.find();
+    async getallposts():Promise<any>{
+        const query=this.postrepository.createQueryBuilder();
+        const posts=query.getMany()
+        return posts;
+    }
+
+   async searchpost(topicdto:GetPostByTopic):Promise<any>{
+       const query=this.postrepository.createQueryBuilder('post');
+       const {search}=topicdto;
+      
+       if(search){
+           query.andWhere(
+            'post.text LIKE :search',{search:`%${search}%`}
+           );
+       }
+    
+       const posts=await query.getMany();
        return posts;
 
    }
+   async getpostbytopic(topicdto:GetPostByTopic):Promise<any>{
+    const query=this.postrepository.createQueryBuilder('post');
+    const {topic}=topicdto;
+    if(topic){
+        query.andWhere('post.topic = :topic',{topic});
+    }
+   
+ 
+    const posts=await query.getMany();
+    return posts;
 
-   async getsinglepost(post_id:string):Promise<any>{
-       const post=this.postrepository.find({ where:post_id });
+}
+
+
+   async getsinglepost(post_id:string):Promise<Posts>{
+       const post=await this.postrepository.findOne(post_id);
+       if(!post){
+           throw new NotFoundException();
+       }
        return post;
        
    }
 
-   async insertpost(data:any):Promise<any>{
+   async insertpost(data:PostsDto):Promise<any>{
        console.log(data)
        try{
-           const post=new Posts();
-           console.log(data);
-           data.post_id=uuidv4();
-           post.post_id=data.post_id;
-           post.topic=data.topic;
-           post.likes=[];
-           post.text=data.text;
-           
-           await this.postrepository.save(post);
+       
+       const {topic,text}=data;
+        const post=this.postrepository.create({
+            topic,
+            text,
+            likes:[],
 
-           return{
-               success:true,
-               message:'sucessfully inserted post'
-           };
+        })
+        await this.postrepository.save(post);
+        return{
+            post,
+            sucess:true,
+            message:'post ids uploded',
+        };
+    }catch(err){
+        console.log(err,'err');
+        return{
+            sucess:true,
+            message:'post is uploaded'
+        };
 
-       }catch(err){
-           console.log('err',err);
-           return{
-               success:false,
-               message:'post is not inserted'
-           };
-       }
-
+    }
+    
+          
+    
+        
+        
    }
 
-   async updatepost(data:any):Promise<any>{
-       console.log(data);
+   async updatepost(post_id:string,updatepostdto:UpdatePostDto):Promise<any>{
+       console.log(updatepostdto);
        try{
-         this.postrepository.save(data);
+         const{topic,text}=updatepostdto;
+         const post=await this.getsinglepost(post_id);
+         post.topic=topic;
+         post.text=text;
+         await this.postrepository.save(post);
+         
        
        return{
+           post,
            success:true,
            message:'Post is updated'
        };
@@ -79,26 +122,35 @@ export class PostsService {
 
    async deletepost(post_id:string):Promise<any>{
        try{
-           this.postrepository.delete(post_id);
+           
+           const result =await this.postrepository.delete(post_id);
+           if (result.affected===0){
+            throw new NotFoundException(`Task with ID "${post_id}" not found`);
+           }
            return{
                success:true,
                message:'post deleted successfully'
 
            };
-       }catch(err){
-           console.log('err',err);
-           return{
-               success:false,
-               message:'post is not deleted'
+        
+        
+        }catch(err){
+               console.log('err',err);
+               return{
+                   sucess:false,
+                   message:'post is not deleted'
+            
+
+               }
            }
-       }
+      
    }
 
    async likepost(post_id:string,user_id:string):Promise<any>{
        try{
            const post=await this.getsinglepost(user_id)
            if(post.likes.some(like => like === user_id)){
-                post.likes.splice(post.likes.indexof(user_id),1);
+                post.likes.splice(post.likes.indexOf(user_id),1);
                 return await this.postrepository.save(post)
            }
            else{
@@ -111,141 +163,7 @@ export class PostsService {
 
    }
 
-   // <<<<<<<<<<<<<<<<<< COMMENTS - ALPHIN ROY >>>>>>>>>>>>>>>>>>>>>>>
-   async getallcommentswithpostdetails(post_id:string):Promise<any>{
+ 
 
-    try{
-        var post =await this.postrepository.findOne(post_id,{relations:['comments']})
-    //  var comments=await this.commentrepository.find({where:{post}})
-    
-    return{
-        post
-    };
- }catch(err){
-     console.log('err',err);
-     return{
-         success:false,
-         message:'comment not obtained'
-     };
-    }}
-    async getallpostswithcommentscount():Promise<any>{
-
-        try{
-            // var post =await this.postrepository.createQueryBuilder("post").leftJoinAndSelect("post.comments","Comments").getMany()
-            var post =await this.postrepository.createQueryBuilder("post").loadRelationCountAndMap('post.commentsCount', 'post.comments').getMany()
-
-        //  var comments=await this.commentrepository.find({where:{post}})
-        
-        return post
-    
-     }catch(err){
-         console.log('err',err);
-         return{
-             success:false,
-             message:'comment not obtained'
-         };
-        }}
-   async getallcomments(post_id:string):Promise<any>{
-
-    try{
-        var post =await this.postrepository.findOne(post_id)
-     var comments=await this.commentrepository.find({where:{post}})
-    
-    return{
-        comment:comments
-    };
- }catch(err){
-     console.log('err',err);
-     return{
-         success:false,
-         message:'comment not obtained'
-     };
-    }}
-  
-  
-   async addcomment(post_id:string,data:any):Promise<any>{
-
-
-    try{
-        const post=await this.postrepository.findOne(post_id)
-       
-       if(post!=null){ const comment =new Comments()
-        comment.comment_id=uuidv4();
-        comment.user_id=data.user_id//;;;;;;; some changes with user comment
-        comment.post=post;
-        comment.body=data.body;
-        console.log(comment)
-      await this.commentrepository.save(comment);
-    
-    return{
-        success:true,
-        message:'Comment is added'
-    };}
-    else{
-        return{
-            success:false,
-            message:'No such post exist'
-        };
-    }
- }catch(err){
-     console.log('err',err);
-     return{
-         success:false,
-         message:'comment is not added'
-     };
-    }}
-    
-    async updatecomment(comment_id:string,data:any):Promise<any>{
-        try{
-            console.log(data.body);
-            console.log(comment_id)
-            
-           
-            const result=await this.commentrepository.createQueryBuilder('s').update(Comments).set({body: data.body}).where(comment_id).execute();
-            console.log(result)
-            if(result?.affected !==1){
-                return{
-                    success:false,
-                    message:'comment is not updated 1'
-                }
-            }
-            else{
-                return{
-                    success:true,
-                    message:'comment is updated'
-                }
-            }
-            
-        }catch(err){
-            return{
-                success:false,
-                message:'comment is not updated'
-            }
-        }}
-   async deletecomment(comment_id:string):Promise<any>{
-    try{
-        const result=await this.commentrepository.createQueryBuilder('e').delete().where('comment_id = :comment_id' ,{comment_id}).execute();
-        console.log(result)
-        if(result?.affected !==1){
-            throw new NotFoundException();
-        }
-        else{
-            return{
-                success:true,
-                message:'comment is deleted'
-            }
-        }
-        
-    }catch(err){
-        return{
-            success:false,
-            message:'comment is not deleted'
-        }
-    }
-}
-
-
-// <<<<<<<<<<<<<<<<<<----------------------->>>>>>>>>>>>>>>>>>>>>>>
-
-
+   
 }

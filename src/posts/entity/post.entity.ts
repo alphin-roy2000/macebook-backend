@@ -11,9 +11,10 @@ import {
 
 } from 'typeorm';
 
-@Entity('Posts')
+
+@Entity()
 export class Posts {
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn('uuid')
     post_id:string;
 
     @CreateDateColumn()
