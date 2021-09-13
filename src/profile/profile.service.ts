@@ -3,37 +3,58 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import Profile from './entities/profile.entity';
 import { v4 as uuidv4 } from 'uuid';
-
+import Skills from './entities/skills.entity';
+const fs = require('fs')
 @Injectable()
 export class ProfileService {
   constructor(
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
+    @InjectRepository(Skills)
+    private readonly skillsRepository: Repository<Skills>,
   ) { }
   async getProfileDetails(): Promise<any> {
     const profile = await this.profileRepository.find();
     return profile;
   }
 
-  async getOneprofileDetail(profile_id: string): Promise<any> {
-    const profile = await this.profileRepository.find({ where: profile_id });
+  async getOneprofileDetail(profile_id: any): Promise<any> {
+    // const profile = await this.profileRepository.find({ where: profile_id });
+    var profile = await this.profileRepository.createQueryBuilder("profile").leftJoin("profile.skills", "skills").addSelect("skills.skill").where("profile.profile_id = :profile_id", { profile_id: profile_id.profile_id }).getOne()
     return profile;
   }
 
   async insertprofile(data: any): Promise<any> {
-
-    console.log(data);
-
     try {
-      console.log(data);
-      data.profile_id = uuidv4();
-      await this.profileRepository.save(data);
+      var skills = JSON.parse(data["skills"])
+      //user_id
+      data.utype = "student"
+      console.log(data)
+      delete data.skills
+      var profile = await this.profileRepository.save(data);
+      console.log(profile)
+
+      console.log(skills)
+
+      if (profile != null) {
+
+        var skillarray = []
+        skills.forEach(element => {
+          const skill = new Skills()
+          skill.profile = profile.profile_id
+          skill.skill = element
+          skillarray.push(skill)
+        });
+        console.log(skillarray)
+        await this.skillsRepository.delete({ profile: profile.profile_id })
+        await this.skillsRepository.save(skillarray)
+      }
 
       return {
         success: true,
-        message: 'Successfully inserted profile',
-
+        message: 'Skills and post added'
       };
+
       // }
 
     } catch (err) {
@@ -48,7 +69,29 @@ export class ProfileService {
   async updateprofile(data: any): Promise<any> {
     try {
 
-      await this.profileRepository.save(data);
+      var skills = JSON.parse(data["skills"])
+      //user_id
+      data.utype = "student"
+      console.log(data)
+      delete data.skills
+      var profile = await this.profileRepository.save(data);
+      console.log(profile)
+
+      console.log(skills)
+
+      if (profile != null) {
+
+        var skillarray = []
+        skills.forEach(element => {
+          const skill = new Skills()
+          skill.profile = profile.profile_id
+          skill.skill = element
+          skillarray.push(skill)
+        });
+        console.log(skillarray)
+        await this.skillsRepository.delete({ profile: profile.profile_id })
+        await this.skillsRepository.save(skillarray)
+      }
 
       return {
         success: true,
@@ -83,4 +126,188 @@ export class ProfileService {
       };
     }
   }
+
+
+
+
+
+  // COVER AND PROFILE IMAGE
+
+
+  async uploadprofileimage(profile: any, url: string): Promise<any> {
+
+    try {
+      var user = {
+        profile_id: profile.profile_id,
+        profile_image_url: url
+      }
+      await this.profileRepository.save(user)
+
+      return {
+        success: true,
+        message: 'profile picture is  updated'
+      }
+
+
+    } catch (err) {
+      console.log('err', err);
+      return {
+        success: false,
+        message: 'profile not inserted',
+      };
+    }
+  }
+
+  async uploadcoverimage(profile: any, url: string): Promise<any> {
+
+    try {
+      var user = {
+        profile_id: profile.profile_id,
+        cover_url: url
+      }
+      await this.profileRepository.save(user)
+
+      return {
+        success: true,
+        message: 'profile cover is updated'
+      }
+
+
+    } catch (err) {
+      console.log('err', err);
+      return {
+        success: false,
+        message: 'profile not inserted',
+      };
+    }
+  }
+  async updateprofileimage(profile: any, url: string): Promise<any> {
+
+    try {
+      var profiledata = await this.profileRepository.findOne(profile);
+      console.log(profiledata);
+      var profile_image_url = profiledata.profile_image_url
+      var url_split = profile_image_url.split("/")
+      var filename = url_split[url_split.length - 1]
+      //  console.log(`.../uploads/profile/${filename}`)
+      try {
+        fs.unlinkSync(`./uploads/profile/${filename}`)
+        //file removed
+      } catch (err) {
+        console.error(err)
+      }
+      var user = {
+        profile_id: profile.profile_id,
+        cover_url: url
+      }
+
+      await this.profileRepository.save(user)
+
+      return {
+        success: true,
+        message: 'profile cover is updated'
+      }
+
+
+    } catch (err) {
+      console.log('err', err);
+      return {
+        success: false,
+        message: 'profile not inserted',
+      };
+    }
+  }
+  async updatecoverimage(profile: any, url: string): Promise<any> {
+
+    try {
+      var profiledata = await this.profileRepository.findOne(profile);
+      console.log(profiledata);
+      var cover_url = profiledata.cover_url
+      var url_split = cover_url.split("/")
+      var filename = url_split[url_split.length - 1]
+      //  console.log(`.../uploads/profile/${filename}`)
+      try {
+        fs.unlinkSync(`./uploads/cover/${filename}`)
+        //file removed
+      } catch (err) {
+        console.error(err)
+      }
+      var user = {
+        profile_id: profile.profile_id,
+        cover_url: url
+      }
+      await this.profileRepository.save(user)
+
+      return {
+        success: false,
+        message: 'profile cover is updated'
+      }
+
+
+    } catch (err) {
+      console.log('err', err);
+      return {
+        success: false,
+        message: 'profile not inserted',
+      };
+    }
+  }
+  async deleteprofileimage(profile: any): Promise<any> {
+    try {
+      var profiledata = await this.profileRepository.findOne(profile);
+      console.log(profiledata);
+      var profile_image_url = profiledata.profile_image_url
+      var url_split = profile_image_url.split("/")
+      var filename = url_split[url_split.length - 1]
+      //  console.log(`.../uploads/profile/${filename}`)
+      try {
+        fs.unlinkSync(`./uploads/profile/${filename}`)
+        //file removed
+      } catch (err) {
+        console.error(err)
+      }
+      var profiledatas = await this.profileRepository.createQueryBuilder().update(Profile).set({ profile_image_url: null }).where("profile_id = :profile_id", { profile_id: profile.profile_id }).execute()
+
+      return {
+        success: true,
+        message: 'Successfully deleted profile image',
+      };
+    } catch (err) {
+      console.log('err', err);
+      return {
+        success: false,
+        message: 'profile picture not delete',
+      };
+    }
+  }
+  async deletecoverimage(profile: any): Promise<any> {
+
+    try {
+      var profiledata = await this.profileRepository.findOne(profile);
+      console.log(profiledata);
+      var cover_url = profiledata.cover_url
+      var url_split = cover_url.split("/")
+      var filename = url_split[url_split.length - 1]
+      //  console.log(`.../uploads/profile/${filename}`)
+      try {
+        fs.unlinkSync(`./uploads/cover/${filename}`)
+        //file removed
+      } catch (err) {
+        console.error(err)
+      }
+      await this.profileRepository.createQueryBuilder().update(Profile).set({ cover_url: null }).where("profile_id = :id", { id: profile.profile_id }).execute()
+
+      return {
+        success: true,
+        message: 'Successfully delete profile cover',
+      };
+    } catch (err) {
+      console.log('err', err);
+      return {
+        success: false,
+        message: 'cover not deleted',
+      };
+    }
+  }
 }
+

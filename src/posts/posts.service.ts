@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Comments } from './entity/comment.entity';
 import { Posts } from './entity/post.entity';
 import { v4 as uuidv4 } from 'uuid'
 import { PostsDto } from './dto/create-post.dto';
@@ -14,8 +13,6 @@ export class PostsService {
     constructor(
         @InjectRepository(Posts)
         private readonly postrepository:Repository<Posts>,
-        @InjectRepository(Comments)
-        private readonly commentrepository:Repository<Comments>,
 
    
         ){}

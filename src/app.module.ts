@@ -5,6 +5,8 @@ import { UserModule } from './user/user.module';
 import { JobsModule } from './jobs/jobs.module';
 import { ProfileModule } from './profile/profile.module';
 import { PostsModule } from './posts/posts.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 
 
@@ -17,6 +19,10 @@ import { PostsModule } from './posts/posts.module';
     CommentsModule,
     ProfileModule,
     PostsModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..','uploads'),
+      
+    })
   ],
   controllers: [],
   providers: [],
