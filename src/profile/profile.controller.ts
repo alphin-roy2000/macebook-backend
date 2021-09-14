@@ -12,7 +12,7 @@ export class ProfileController {
     constructor(private readonly profileService: ProfileService) {
     }
 
-    @Get('/search')
+    @Get('/')
     Findprofile(): Promise<any> {
         return this.profileService.getProfileDetails()
     }
@@ -123,11 +123,21 @@ export class ProfileController {
     Invite(@Param() id: string, @Body() body: any) {
         return this.profileService.connectioninvite(id,body.profile_id);
     }
+    @Delete('/:id/cancel')
+    Cancel(@Param() id: string, @Body() body: any) {
+        return this.profileService.connectioncancel(id,body.profile_id);
+    }
 
     @Post('/:id/connect')
     Accept(@Param() id: string, @Body() body: any) {
         console.log(id)
         console.log(body)
         return this.profileService.connectionaccept(id,body.profile_id);
+    }
+    @Delete('/:id/disconnect')
+    Disconnect(@Param() id: string, @Body() body: any) {
+        console.log(id)
+        console.log(body)
+        return this.profileService.connectiondisconnect(id,body.profile_id);
     }
 }

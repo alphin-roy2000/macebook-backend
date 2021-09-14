@@ -416,5 +416,60 @@ export class ProfileService {
       }
     }
   }
+
+
+  async connectiondisconnect(user: any, current_User: any): Promise<any> {
+    
+    if (user.id != current_User) {
+      
+      try {
+        var user_details = await this.profileRepository.findOne(user.id)
+        var current_User_details = await this.profileRepository.findOne(current_User)
+       await this.connectionRepository.createQueryBuilder().delete().where({connected_profile: current_User_details, profile: user_details, status: "connected"}).execute()
+       await this.connectionRepository.createQueryBuilder().delete().where({connected_profile: user_details, profile: current_User_details,status: "connected"}).execute()
+       return {
+        success: true,
+        message: 'Disconnected',
+      };
+      } catch (err) {
+        return {
+          success: false,
+          message: 'Cannot disconnect/or nothing to disconnect',
+        };
+      }
+    }
+    else {
+      return {
+        success: false,
+        message: "Cannot disconnect same user"
+      }
+    }
+  }
+  async connectioncancel(user: any, current_User: any): Promise<any> {
+
+    if (user.id != current_User) {
+      try {
+        var user_details = await this.profileRepository.findOne(user.id)
+        var current_User_details = await this.profileRepository.findOne(current_User)
+       await this.connectionRepository.createQueryBuilder().delete().where({connected_profile: user_details, profile: current_User_details, status: "invite"}).execute()
+       return {
+        success: true,
+        message: 'Cancelled',
+      };
+      } catch (err) {
+        console.log('err', err);
+        return {
+          success: false,
+          message: 'Cannot Cancel',
+        };
+      }
+    }
+    else {
+      return {
+        success: false,
+        message: "Cannot Cancel invitations of same user"
+      }
+    }
+  }
 }
 
