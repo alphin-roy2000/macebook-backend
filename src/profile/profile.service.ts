@@ -3,15 +3,17 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import Profile from './entities/profile.entity';
 import { v4 as uuidv4 } from 'uuid';
-import Skills from './entities/skills.entity';
+import Connections from './entities/connections.entity';
+import { profile } from 'console';
+// import Skills from './entities/skills.entity';
 const fs = require('fs')
 @Injectable()
 export class ProfileService {
   constructor(
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
-    @InjectRepository(Skills)
-    private readonly skillsRepository: Repository<Skills>,
+    @InjectRepository(Connections)
+    private readonly connectionRepository: Repository<Connections>,
   ) { }
   async getProfileDetails(): Promise<any> {
     const profile = await this.profileRepository.find();
@@ -20,35 +22,35 @@ export class ProfileService {
 
   async getOneprofileDetail(profile_id: any): Promise<any> {
     // const profile = await this.profileRepository.find({ where: profile_id });
-    var profile = await this.profileRepository.createQueryBuilder("profile").leftJoin("profile.skills", "skills").addSelect("skills.skill").where("profile.profile_id = :profile_id", { profile_id: profile_id.profile_id }).getOne()
+    var profile = await this.profileRepository.createQueryBuilder("profile").where("profile.profile_id = :profile_id", { profile_id: profile_id.profile_id }).getOne()
     return profile;
   }
 
   async insertprofile(data: any): Promise<any> {
     try {
-      var skills = JSON.parse(data["skills"])
+      // var skills =data["skills"]
       //user_id
       data.utype = "student"
       console.log(data)
-      delete data.skills
+      // delete data.skills
       var profile = await this.profileRepository.save(data);
       console.log(profile)
 
-      console.log(skills)
+      // console.log(skills)
 
-      if (profile != null) {
+      // if (profile != null) {
 
-        var skillarray = []
-        skills.forEach(element => {
-          const skill = new Skills()
-          skill.profile = profile.profile_id
-          skill.skill = element
-          skillarray.push(skill)
-        });
-        console.log(skillarray)
-        await this.skillsRepository.delete({ profile: profile.profile_id })
-        await this.skillsRepository.save(skillarray)
-      }
+      //   var skillarray = []
+      //   skills.forEach(element => {
+      //     const skill = new Skills()
+      //     skill.profile = profile.profile_id
+      //     skill.skill = element
+      //     skillarray.push(skill)
+      //   });
+      //   console.log(skillarray)
+      //   await this.skillsRepository.delete({ profile: profile.profile_id })
+      //   // await this.skillsRepository.save(skillarray)
+      // }
 
       return {
         success: true,
@@ -69,29 +71,29 @@ export class ProfileService {
   async updateprofile(data: any): Promise<any> {
     try {
 
-      var skills = JSON.parse(data["skills"])
+      // var skills = JSON.parse(data["skills"])
       //user_id
       data.utype = "student"
       console.log(data)
-      delete data.skills
+      // delete data.skills
       var profile = await this.profileRepository.save(data);
       console.log(profile)
 
-      console.log(skills)
+      // console.log(skills)
 
-      if (profile != null) {
+      // if (profile != null) {
 
-        var skillarray = []
-        skills.forEach(element => {
-          const skill = new Skills()
-          skill.profile = profile.profile_id
-          skill.skill = element
-          skillarray.push(skill)
-        });
-        console.log(skillarray)
-        await this.skillsRepository.delete({ profile: profile.profile_id })
-        await this.skillsRepository.save(skillarray)
-      }
+      //   var skillarray = []
+      //   skills.forEach(element => {
+      //     const skill = new Skills()
+      //     skill.profile = profile.profile_id
+      //     skill.skill = element
+      //     skillarray.push(skill)
+      //   });
+      //   console.log(skillarray)
+      //   await this.skillsRepository.delete({ profile: profile.profile_id })
+      //   await this.skillsRepository.save(skillarray)
+      // }
 
       return {
         success: true,
@@ -239,7 +241,7 @@ export class ProfileService {
       await this.profileRepository.save(user)
 
       return {
-        success: false,
+        success: true,
         message: 'profile cover is updated'
       }
 
@@ -307,6 +309,111 @@ export class ProfileService {
         success: false,
         message: 'cover not deleted',
       };
+    }
+  }
+
+
+
+
+
+  // CONNECTIONS
+
+  async connectioninvite(user: any, current_User: any): Promise<any> {
+
+    if (user.id != current_User) {
+      try {
+        console.log(user)
+        console.log(current_User)
+
+        var user_details = await this.profileRepository.findOne(user.id)
+        var current_User_details = await this.profileRepository.findOne(current_User)
+
+        if (user_details && current_User_details) {
+          var check = await this.connectionRepository.findOne({ connected_profile: user_details, profile: current_User_details })
+          console.log(check)
+          if (check == null) {
+            var data = new Connections()
+            data = {
+              connection_id: uuidv4(),
+              connected_profile: user_details,
+              status: "invite",
+              profile: current_User_details
+            }
+            await this.connectionRepository.save(data);
+            return {
+              success: true,
+              message: 'Connection invitation send'
+            }
+          }
+          else {
+            return {
+              success: true,
+              message: 'Already invited'
+            }
+          }
+        }
+      } catch (err) {
+        console.log('err', err);
+        return {
+          success: false,
+          message: 'connection cannot be sent',
+        };
+      }
+    }
+    else {
+      return {
+        success: false,
+        message: "Cannot connect same user"
+      }
+    }
+  }
+
+  async connectionaccept(user: any, current_User: any): Promise<any> {
+
+    if (user.id != current_User) {
+      try {
+        // console.log(user)
+        // console.log(current_User)
+        var user_details = await this.profileRepository.findOne(user.id)
+        var current_User_details = await this.profileRepository.findOne(current_User)
+        if (user_details && current_User_details) {
+          var check = await this.connectionRepository.findOne({ connected_profile: current_User_details, profile: user_details, status: "invite" })
+          console.log(check)
+          if (check != null) {
+            await this.connectionRepository.createQueryBuilder().update(Connections).set({ status: "connected" }).where("connection_id = :connection_id", { connection_id: check.connection_id }).execute()
+            var data = new Connections()
+            data = {
+              connection_id: uuidv4(),
+              connected_profile: user_details,
+              status: "connected",
+              profile: current_User_details
+            }
+            await this.connectionRepository.save(data);
+            return {
+              success: true,
+              message: 'Connected'
+            }
+          }
+          else {
+            return {
+              success: true,
+              message: 'No invitation'
+            }
+          }
+        }
+      } catch (err) {
+        console.log('err', err);
+        return {
+          success: false,
+          message: 'No such users',
+        };
+      }
+    }
+    else {
+      return {
+        success: false,
+        message: "Cannot connect same user"
+      }
     }
   }
 }

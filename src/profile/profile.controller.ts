@@ -114,4 +114,20 @@ export class ProfileController {
         return this.profileService.deletecoverimage(profile_id);
 
     }
+
+
+
+    // CONNECTION CREATION //status= "invite","connected"
+
+    @Post('/:id/invite')
+    Invite(@Param() id: string, @Body() body: any) {
+        return this.profileService.connectioninvite(id,body.profile_id);
+    }
+
+    @Post('/:id/connect')
+    Accept(@Param() id: string, @Body() body: any) {
+        console.log(id)
+        console.log(body)
+        return this.profileService.connectionaccept(id,body.profile_id);
+    }
 }

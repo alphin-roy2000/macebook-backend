@@ -4,7 +4,8 @@ import {
   Column,
   OneToMany,
 } from 'typeorm';
-import Skills from './skills.entity';
+import Connections from './connections.entity';
+// import Skills from './skills.entity';
 
 @Entity('Profile')
 export default class Profile {
@@ -14,26 +15,14 @@ export default class Profile {
   @Column({ length: 100,nullable: true })
   fullname: string;
 
-  @Column({ length: 100,nullable: true })
-  branch: string;
-
-  @Column({ length: 100,nullable: true })
-  batch: string;
-
-  @Column({ length: 100,nullable: true })
-  admissionno: string;
+  @Column("simple-json",{nullable:true})
+  admission:{ admission_no: string,branch:string, batch: string };
 
   @Column({ length: 15, nullable: true })
   phoneno: string;
 
-  @Column({ nullable: true })
-  linkedin: string;
-
-  @Column({ nullable: true })
-  instagram: string;
-
-  @Column({ nullable: true })
-  twitter: string;
+  @Column("simple-json",{nullable:true})
+  urls:{ personal_url:string, linkedin: string, facebook: string,github: string };
 
   @Column({ length: 1024, nullable: true })
   bio: string;
@@ -59,6 +48,17 @@ export default class Profile {
   @Column({ nullable: true })
   ref_phonenumber: string;
 
-  @OneToMany(() => Skills, (skills) => skills.profile)
-  skills: Skills[];
+  // @OneToMany(() => Skills, (skills) => skills.profile)
+  // skills: Skills[];
+  @Column("simple-array",{nullable:true})
+  skills: String[]
+
+  @Column({ type: 'simple-array',nullable:true })
+  accomplishments: string[];
+
+  @OneToMany(() => Connections, (connection) => connection.profile,{nullable:true})
+  connections: Connections[];
+
+  @OneToMany(() => Connections, (connection) => connection.connected_profile,{nullable:true})
+  secondaryconnections: Connections[];
 }
