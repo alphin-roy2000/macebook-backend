@@ -5,7 +5,8 @@ import {
   OneToMany,
 } from 'typeorm';
 import Connections from './connections.entity';
-// import Skills from './skills.entity';
+import Experience from './experience.entity';
+import Skills from './skills.entity';
 
 @Entity('Profile')
 export default class Profile {
@@ -48,17 +49,19 @@ export default class Profile {
   @Column({ nullable: true })
   ref_phonenumber: string;
 
-  // @OneToMany(() => Skills, (skills) => skills.profile)
-  // skills: Skills[];
-  @Column("simple-array",{nullable:true})
-  skills: String[]
+  @OneToMany(() => Skills, (skills) => skills.profile)
+  skills: Skills[];
+
 
   @Column({ type: 'simple-array',nullable:true })
   accomplishments: string[];
 
   @OneToMany(() => Connections, (connection) => connection.profile,{nullable:true})
-  connections: Connections[];
+  connections: Connections[];//We try to connect others
 
   @OneToMany(() => Connections, (connection) => connection.connected_profile,{nullable:true})
-  secondaryconnections: Connections[];
+  secondaryconnections: Connections[];//Others who try to connect us
+
+  @OneToMany(() => Experience, (experience) => experience.profile,{nullable:true})
+  experience: Experience[];
 }

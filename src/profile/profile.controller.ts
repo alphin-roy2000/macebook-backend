@@ -140,4 +140,26 @@ export class ProfileController {
         console.log(body)
         return this.profileService.connectiondisconnect(id,body.profile_id);
     }
+
+
+    // Experience
+
+    @Post('/experience/:profile_id')
+    AddExperience(@Param() profile_id: string, @Body() experienceDto: any) {
+        return this.profileService.addExperience(profile_id,experienceDto);
+    }
+
+    @Patch('/experience/:profile_id&:experience_id')
+    UpdateExperience(@Param() param: any, @Body() experienceDto: any) {
+        return this.profileService.updateExperience(param.profile_id,param.experience_id,experienceDto);
+    }
+
+    @Delete('/experience/:profile_id&:experience_id')
+    DeleteExperience(@Param() param: any) {
+        return this.profileService.deleteExperience(param.profile_id,param.experience_id);
+    }
+
+
+
+    
 }

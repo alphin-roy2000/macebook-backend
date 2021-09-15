@@ -5,6 +5,9 @@ import Profile from './entities/profile.entity';
 import { v4 as uuidv4 } from 'uuid';
 import Connections from './entities/connections.entity';
 import { profile } from 'console';
+import Skills from './entities/skills.entity';
+import Experience from './entities/experience.entity';
+import Company from 'src/company/entities/company.entity';
 // import Skills from './entities/skills.entity';
 const fs = require('fs')
 @Injectable()
@@ -14,6 +17,12 @@ export class ProfileService {
     private readonly profileRepository: Repository<Profile>,
     @InjectRepository(Connections)
     private readonly connectionRepository: Repository<Connections>,
+    @InjectRepository(Skills)
+    private readonly skillsRepository: Repository<Skills>,
+    @InjectRepository(Experience)
+    private readonly experienceRepository: Repository<Experience>,
+    @InjectRepository(Company)
+    private readonly companyRepository: Repository<Company>,
   ) { }
   async getProfileDetails(): Promise<any> {
     const profile = await this.profileRepository.find();
@@ -22,34 +31,33 @@ export class ProfileService {
 
   async getOneprofileDetail(profile_id: any): Promise<any> {
     // const profile = await this.profileRepository.find({ where: profile_id });
-    var profile = await this.profileRepository.createQueryBuilder("profile").where("profile.profile_id = :profile_id", { profile_id: profile_id.profile_id }).getOne()
+    var profile = await this.profileRepository.createQueryBuilder("profile").leftJoin("profile.skills","skills").addSelect("skills.skill").where("profile.profile_id = :profile_id", { profile_id: profile_id.profile_id }).getOne()
     return profile;
   }
 
   async insertprofile(data: any): Promise<any> {
     try {
-      // var skills =data["skills"]
+      var skills =data["skills"]
       //user_id
       data.utype = "student"
-      console.log(data)
-      // delete data.skills
+      delete data.skills
       var profile = await this.profileRepository.save(data);
       console.log(profile)
 
-      // console.log(skills)
+      console.log(skills)
 
       // if (profile != null) {
 
-      //   var skillarray = []
-      //   skills.forEach(element => {
-      //     const skill = new Skills()
-      //     skill.profile = profile.profile_id
-      //     skill.skill = element
-      //     skillarray.push(skill)
-      //   });
-      //   console.log(skillarray)
-      //   await this.skillsRepository.delete({ profile: profile.profile_id })
-      //   // await this.skillsRepository.save(skillarray)
+        var skillarray = []
+        skills.forEach(element => {
+          const skill = new Skills()
+          skill.profile = profile.profile_id
+          skill.skill = element
+          skillarray.push(skill)
+        });
+        console.log(skillarray)
+        await this.skillsRepository.delete({ profile: profile.profile_id })
+        await this.skillsRepository.save(skillarray)
       // }
 
       return {
@@ -471,5 +479,82 @@ export class ProfileService {
       }
     }
   }
+
+
+
+  // EXPERIENCE
+
+  async addExperience(profile_id: any, data: any): Promise<any> {
+
+      try {
+       try {
+        var profile=await this.profileRepository.findOne(profile_id);
+        var company=await this.companyRepository.findOne(data.company_id);
+       } catch (error) {
+         console.log(error)
+       }
+        
+        if(company !=null){
+        data.company=company;
+
+        }
+        data.profile=profile
+        console.log(data)
+
+        this.experienceRepository.save(data);
+        return {
+        success: true,
+        message: 'Experience Added',
+      };
+      } catch (err) {
+        return {
+          success: false,
+          message: 'Cannot Add Experience',
+        };
+      }}
+      async updateExperience(profile_id: string,experience_id:string ,data: any): Promise<any> {
+
+        try {
+         try {
+          var profile=await this.profileRepository.findOne(profile_id);
+          var company=await this.companyRepository.findOne(data.company_id);
+         } catch (error) {
+           console.log(error)
+         }
+          
+          if(company !=null){
+          data.company=company;
+  
+          }
+          data.profile=profile
+          console.log(data)
+          delete(data.company_id)
+          this.experienceRepository.createQueryBuilder().update(Experience).set(data).where("experience_id = :experience_id",{experience_id:experience_id}).execute();
+          return {
+          success: true,
+          message: 'Experience Updated',
+        };
+        } catch (err) {
+          return {
+            success: false,
+            message: 'Cannot Update Experience',
+          };
+        }}
+      async deleteExperience(profile_id: string, experience_id: string): Promise<any> {
+
+        try {
+          var profile = await this.profileRepository.findOne(profile_id)
+         await this.experienceRepository.createQueryBuilder().delete().where({experience_id: experience_id, profile: profile}).execute()
+         return {
+          success: true,
+          message: 'Deleted',
+        };
+        } catch (err) {
+          return {
+            success: false,
+            message: 'Cannot Delete',
+          };
+        }}
+   
 }
 
