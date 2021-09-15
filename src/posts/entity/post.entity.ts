@@ -1,3 +1,4 @@
+import { Comments } from 'src/comments/entities/comment.entity';
 import {
     Entity,
     Column,
@@ -5,7 +6,8 @@ import {
     UpdateDateColumn,
     Unique,
     PrimaryColumn,
-    PrimaryGeneratedColumn
+    PrimaryGeneratedColumn,
+    OneToMany
 
 } from 'typeorm';
 
@@ -26,5 +28,10 @@ export class Posts {
 
     @Column({ type: 'simple-array' })
     likes: string[];
-    
+
+
+    //Post-Comment(AR)
+    @OneToMany(() => Comments, (comments) => comments.post)
+    comments: Comments[];
+
 }

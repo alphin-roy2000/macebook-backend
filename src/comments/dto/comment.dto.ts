@@ -10,7 +10,7 @@ export class CommentsDto {
     example: 'Hello, this is a cool post. Hey congrats on your new job.',
   })
   @IsString()
-  readonly comment: string;
+  readonly body: string;
 
   @ApiProperty({
     description:
@@ -20,7 +20,7 @@ export class CommentsDto {
   })
   @IsString()
 
-  readonly userid: string;
+  readonly user_id: string;
   @ApiProperty({
     description:
       'Post Id',
@@ -30,7 +30,7 @@ export class CommentsDto {
 
   @IsString()
 
-  readonly postid: string;
+  readonly post_id: string;
 
 
 

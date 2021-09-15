@@ -13,7 +13,9 @@ export class PostsService {
     constructor(
         @InjectRepository(Posts)
         private readonly postrepository:Repository<Posts>,
-    ){}
+
+   
+        ){}
 
     async getallposts():Promise<any>{
         const query=this.postrepository.createQueryBuilder();
