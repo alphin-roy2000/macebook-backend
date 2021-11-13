@@ -1,4 +1,6 @@
 import { Comments } from 'src/comments/entities/comment.entity';
+import Profile from 'src/profile/entities/profile.entity';
+import  User  from "src/user/entities/user.entity";
 import {
     Entity,
     Column,
@@ -7,7 +9,8 @@ import {
     Unique,
     PrimaryColumn,
     PrimaryGeneratedColumn,
-    OneToMany
+    OneToMany,
+    ManyToOne
 
 } from 'typeorm';
 
@@ -29,9 +32,16 @@ export class Posts {
     @Column({ type: 'simple-array' })
     likes: string[];
 
+    @Column({ nullable: true })
+    post_image_name: string;
+
 
     //Post-Comment(AR)
     @OneToMany(() => Comments, (comments) => comments.post)
     comments: Comments[];
+
+    //POST-PROFILE CONNECTION
+    @ManyToOne(() => Profile, (user) => user.posts)
+    user: Profile;
 
 }
