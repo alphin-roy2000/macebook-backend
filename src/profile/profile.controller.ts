@@ -19,24 +19,24 @@ export class ProfileController {
   constructor(private readonly profileService: ProfileService) {
   }
 
-  @Get('/')
-  @ApiOperation({ summary: 'Get All Profile' })
-  Findprofile(): Promise<any> {
-    return this.profileService.getProfileDetails()
+  @Get('/all/:key')
+  @ApiOperation({ summary: 'Get All Profile by key' })
+  Findprofile(@Param() param: any): Promise<any> {
+    return this.profileService.getProfileDetails(param.key)
   }
   @Get('/search/:key')
   @ApiOperation({ summary: 'Search Profile' })
   @ApiParam({ name: 'key', required: true, schema: { oneOf: [{ type: 'string' }] } })
   Searchprofile(@Param() param: any): Promise<any> {
-    return this.profileService.getProfileDetails()
+    return this.profileService.getProfileDetails(param.key)
   }
-  @UseGuards(AuthGuard('jwt'))
-  @Get('/p1')
+
+  @Get('/p1/:id')
   @ApiOperation({ summary: 'Get Profile by id' })
-  // @ApiParam({ name: 'profile_id', required: true, schema: { oneOf: [{ type: 'string' }] } })
-  FindOneProfile(@Req() req:RequestWithUser): Promise<any> {
-    console.log(req.user.uid);
-    return this.profileService.getOneprofileDetail(req.user.uid)
+  @ApiParam({ name: 'id', required: true, schema: { oneOf: [{ type: 'string' }] } })
+  FindOneProfile(@Param() param:any): Promise<any> {
+
+    return this.profileService.getOneprofileDetail(param.id)
   }
   //     @Get('/p2/:profile_id')
   //     @ApiOperation({ summary: 'Get Profile by id' })
