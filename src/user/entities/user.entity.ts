@@ -37,8 +37,7 @@ import {
 
 
     //CONNECTION WITH POST MODULE
-    @OneToMany(()=>Posts, (post)=>post.user)
-    posts:Posts[]
+    
 
     
   }

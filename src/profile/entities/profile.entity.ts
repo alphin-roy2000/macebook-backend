@@ -1,3 +1,4 @@
+import { Posts } from 'src/posts/entity/post.entity';
 import {
   Entity,
   PrimaryColumn,
@@ -64,4 +65,7 @@ export default class Profile {
 
   @OneToMany(() => Experience, (experience) => experience.profile,{nullable:true})
   experience: Experience[];
+
+  @OneToMany(()=>Posts, (post)=>post.user)
+    posts:Posts[]
 }

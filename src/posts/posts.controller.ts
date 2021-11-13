@@ -59,7 +59,8 @@ export class PostsController {
 
     }
 
-      // PROFILE AND COVER IMAGES
+      // POST IMAGES
+      @UseGuards(AuthGuard('jwt'))
       @Post('/picture/:post_id')
       @UseInterceptors(FileInterceptor('postimage', {
           storage: diskStorage({
@@ -74,6 +75,8 @@ export class PostsController {
         return this.postservice.uploadpostphoto(post_id, file.filename);
       }
 
+      // UPDATE POST IMAGE
+      @UseGuards(AuthGuard('jwt'))
       @Patch('/picture/:post_id')
       @UseInterceptors(FileInterceptor('postimage', {
           storage: diskStorage({
@@ -88,6 +91,8 @@ export class PostsController {
           return this.postservice.updatepostimage(post_id, file.filename);
       }
 
+      //DELETE POST IMAGE
+      @UseGuards(AuthGuard('jwt'))
       @Delete('/picture/:post_id')
         deletepostimage(@Param() post_id: string) {
         console.log("sd")
