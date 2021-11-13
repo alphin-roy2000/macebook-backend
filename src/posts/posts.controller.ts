@@ -125,6 +125,20 @@ export class PostsController {
       //DELETE POST IMAGE
       @UseGuards(AuthGuard('jwt'))
       @Delete('/picture/:post_id')
+      @ApiOperation({ summary: 'delete post image' })
+  // @ApiParam({ name: 'profile_id', required: true, schema: { oneOf: [{ type: 'string' }] } })
+     @ApiConsumes('multipart/form-data')
+      @ApiBody({
+        schema: {
+          type: 'object',
+          properties: {
+            cover: {
+              type: 'string',
+              format: 'binary',
+            },
+          },
+        },
+      })
         deletepostimage(@Param() post_id: string) {
         console.log("sd")
         return this.postservice.deletepostimage(post_id);
