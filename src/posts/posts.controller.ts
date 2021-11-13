@@ -37,9 +37,10 @@ export class PostsController {
         return this.postservice.getsinglepost(post_id)
     }
 
+    @UseGuards(AuthGuard('jwt'))
     @Post('/add_post')
-    InsertPost(@Body() postdto:PostsDto): Promise <any> {
-        return this.postservice.insertpost(postdto)
+    InsertPost(@Body() postdto:PostsDto,@Req() req:RequestWithUser): Promise <any> {
+        return this.postservice.insertpost(postdto,req.user.uid)
     }
 
     @Patch('/:post_id/update_post')
