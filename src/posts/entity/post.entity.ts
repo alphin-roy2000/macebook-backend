@@ -41,7 +41,7 @@ export class Posts {
     comments: Comments[];
 
     //POST-PROFILE CONNECTION
-    @ManyToOne(() => Profile, (user) => user.posts)
-    user: Profile;
+    @ManyToOne(() => Profile, (profile) => profile.posts)
+    profile: Profile;
 
 }

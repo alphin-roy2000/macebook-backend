@@ -1,9 +1,13 @@
+import { Comments } from 'src/comments/entities/comment.entity';
 import { Posts } from 'src/posts/entity/post.entity';
+import User from 'src/user/entities/user.entity';
 import {
   Entity,
   PrimaryColumn,
   Column,
   OneToMany,
+  OneToOne,
+  JoinColumn
 } from 'typeorm';
 import Connections from './connections.entity';
 import Experience from './experience.entity';
@@ -66,6 +70,14 @@ export default class Profile {
   @OneToMany(() => Experience, (experience) => experience.profile,{nullable:true})
   experience: Experience[];
 
-  @OneToMany(()=>Posts, (post)=>post.user)
+  //connection on posts and profile
+  @OneToMany(()=>Posts, (post)=>post.profile)
     posts:Posts[]
+
+  //connection on post and profile
+  @OneToMany(()=>Comments, (comment)=>comment.profile)
+  comments:Comments[]
+
+  @OneToOne(() => User, user => user.profile) // specify inverse side as a second parameter
+    user: User;
 }
