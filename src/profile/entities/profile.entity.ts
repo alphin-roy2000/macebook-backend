@@ -8,6 +8,7 @@ import Connections from './connections.entity';
 import Experience from './experience.entity';
 import Skills from './skills.entity';
 
+
 @Entity('Profile')
 export default class Profile {
   @PrimaryColumn({ unique: true })
@@ -26,10 +27,10 @@ export default class Profile {
   urls:{ personal_url:string, linkedin: string, facebook: string,github: string };
 
   @Column({ length: 1024, nullable: true })
-  bio: string;
+  about: string;
 
-  @Column({ length: 1024, nullable: true })
-  address: string;
+  @Column("simple-json",{nullable:true})
+  address:{ place:string, district: string, state: string,country: string };
 
   @Column({nullable: true})
   utype: string;              //alumini or student
@@ -56,12 +57,13 @@ export default class Profile {
   @Column({ type: 'simple-array',nullable:true })
   accomplishments: string[];
 
-  @OneToMany(() => Connections, (connection) => connection.profile,{nullable:true})
+  @OneToMany(() => Connections, (connection) => connection.connection_memberid,{nullable:true})
   connections: Connections[];//We try to connect others
 
-  @OneToMany(() => Connections, (connection) => connection.connected_profile,{nullable:true})
+  @OneToMany(() => Connections, (connection) => connection.member_id,{nullable:true})
   secondaryconnections: Connections[];//Others who try to connect us
 
   @OneToMany(() => Experience, (experience) => experience.profile,{nullable:true})
   experience: Experience[];
 }
+export class ProfileSwagger extends Profile {}
