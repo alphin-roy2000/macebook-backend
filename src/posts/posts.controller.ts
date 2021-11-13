@@ -12,6 +12,8 @@ import RequestWithUser from 'src/user/interfaces/requestWithUser.interface';
 import jwtAuthenticationGuard from 'src/user/guards/jwt-auth.guard'
 import localAuthenticationGuard from 'src/user/guards/local-auth.guard'
 import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+
 @Controller('api/v1/posts')
 export class PostsController {
     constructor (private readonly postservice:PostsService){
@@ -63,6 +65,20 @@ export class PostsController {
       // POST IMAGES
       @UseGuards(AuthGuard('jwt'))
       @Post('/picture/:post_id')
+      @ApiOperation({ summary: 'Upload post image' })
+  // @ApiParam({ name: 'profile_id', required: true, schema: { oneOf: [{ type: 'string' }] } })
+     @ApiConsumes('multipart/form-data')
+      @ApiBody({
+        schema: {
+          type: 'object',
+          properties: {
+            cover: {
+              type: 'string',
+              format: 'binary',
+            },
+          },
+        },
+      })
       @UseInterceptors(FileInterceptor('postimage', {
           storage: diskStorage({
               destination: './uploads/post',
@@ -79,6 +95,20 @@ export class PostsController {
       // UPDATE POST IMAGE
       @UseGuards(AuthGuard('jwt'))
       @Patch('/picture/:post_id')
+      @ApiOperation({ summary: 'Update post image' })
+  // @ApiParam({ name: 'profile_id', required: true, schema: { oneOf: [{ type: 'string' }] } })
+     @ApiConsumes('multipart/form-data')
+      @ApiBody({
+        schema: {
+          type: 'object',
+          properties: {
+            cover: {
+              type: 'string',
+              format: 'binary',
+            },
+          },
+        },
+      })
       @UseInterceptors(FileInterceptor('postimage', {
           storage: diskStorage({
               destination: './uploads/post',
