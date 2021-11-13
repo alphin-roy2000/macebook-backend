@@ -1,30 +1,32 @@
-import {
-    Entity,
-    Column,
-    CreateDateColumn,
-    PrimaryColumn,
-    UpdateDateColumn,
-} from 'typeorm';
+import User from 'src/user/entities/user.entity';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, PrimaryColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Posts } from 'src/posts/entity/post.entity';
+import Profile from 'src/profile/entities/profile.entity';
+import { profile } from 'console';
 
-@Entity('Comment')
-export default class Comment {
-    @PrimaryColumn()
-    commentid: string;
+@Entity('Comments')
+export class Comments {
 
-    @Column()
-    comment: string;
+  @PrimaryColumn()
+  comment_id: string;
 
-    @Column()
-    userid: string
-
-    @Column()
-    postid: string;
+  @Column()
+  body: string;
 
 
-    @CreateDateColumn()
-    createdAt: Date;
+  @ManyToOne(() => Posts, (post) => post.comments,{nullable:false, onUpdate: 'CASCADE', onDelete: 'CASCADE' })
+  @JoinColumn()
+  post: Posts;
 
-    @UpdateDateColumn({select: false})
-    editedAt?: Date;
+  @ManyToOne(() => Profile, (profile) => profile.comments,{nullable:false, onUpdate: 'CASCADE', onDelete: 'CASCADE' })
+  @JoinColumn()
+  profile: Profile;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn({select: false})
+  editedAt?: Date;
 
 }
+
