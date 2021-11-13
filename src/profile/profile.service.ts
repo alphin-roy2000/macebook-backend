@@ -29,8 +29,8 @@ export class ProfileService {
     var profile;
     return profile;
   }
-  async getOneprofileDetail(profile_id: any): Promise<any> {
-    var profile = await this.profileRepository.createQueryBuilder("profile").leftJoin("profile.skills", "skills").addSelect("skills.skill").leftJoinAndSelect("profile.experience", "experience").where("profile.profile_id = :profile_id", { profile_id: profile_id.profile_id }).getOne()
+  async getOneprofileDetail(profile_id: string): Promise<any> {
+    var profile = await this.profileRepository.createQueryBuilder("profile").leftJoin("profile.skills", "skills").addSelect("skills.skill").leftJoinAndSelect("profile.experience", "experience").where("profile.profile_id = :profile_id", { profile_id: profile_id }).getOne()
     return profile;
   }
 
@@ -172,10 +172,10 @@ export class ProfileService {
       };
     }
   }
-  async updateprofileimage(profile: any, url: string): Promise<any> {
+  async updateprofileimage(profile_id: string, filenameget: string): Promise<any> {
 
     try {
-      var profiledata = await this.profileRepository.findOne(profile);
+      var profiledata = await this.profileRepository.findOne({where:{profile_id:profile_id}});
       console.log(profiledata);
       var profile_image_url = profiledata.profile_image_url
       var url_split = profile_image_url.split("/")
@@ -188,15 +188,14 @@ export class ProfileService {
         console.error(err)
       }
       var user = {
-        profile_id: profile.profile_id,
-        cover_url: url
+        profile_id: profile_id,
+        profile_image_url: filenameget
       }
-
-      await this.profileRepository.save(user)
+      var pro= await this.profileRepository.save(user)
 
       return {
         success: true,
-        message: 'profile cover is updated'
+        message: 'profile image is updated'
       }
 
 
@@ -208,10 +207,50 @@ export class ProfileService {
       };
     }
   }
-  async updatecoverimage(profile: any, url: string): Promise<any> {
+  // async updateprofileimage(profile_id: string, url: string): Promise<any> {
+
+  //   try {
+  //     var profiledata = await this.profileRepository.findOne({where:{profile_id:profile_id}});
+  //     console.log("profiledata");
+  //     // console.log(profiledata);
+  //     // var profile_image_url = profiledata.profile_image_url
+  //     // var url_split = profile_image_url.split("/")
+  //     var profile_image_url = profiledata.cover_url
+  //     var url_split = profile_image_url.split("/")
+  //     var filename = url_split[url_split.length - 1]
+  //     //  console.log(`.../uploads/profile/${filename}`)
+  //     try {
+  //       fs.unlinkSync(`./uploads/profile/${filename}`)
+  //       //file removed
+  //     } catch (err) {
+  //       console.error(err)
+  //     }
+  //     var user = {
+  //       profile_id: profile_id,
+  //       profile_image_url: url
+  //     }
+  //     await this.profileRepository.createQueryBuilder().update(Profile).set({ profile_image_url: url }).where("profile_id = :profile_id", { profile_id: profile_id }).execute()
+  //     console.log(user)
+
+  //     return {
+  //       success: true,
+  //       message: 'profile cover is updated'
+  //     }
+
+
+  //   } catch (err) {
+  //     console.log('err', err);
+  //     return {
+  //       success: false,
+  //       message: 'cover not inserted',
+  //     };
+  //   }
+  // }
+  async updatecoverimage(profile_id: any, filenameget: string): Promise<any> {
 
     try {
-      var profiledata = await this.profileRepository.findOne(profile);
+      var profiledata = await this.profileRepository.findOne({where:{profile_id:profile_id}});
+
       console.log(profiledata);
       var cover_url = profiledata.cover_url
       var url_split = cover_url.split("/")
@@ -219,13 +258,13 @@ export class ProfileService {
       //  console.log(`.../uploads/profile/${filename}`)
       try {
         fs.unlinkSync(`./uploads/cover/${filename}`)
-        //file removed
+
       } catch (err) {
         console.error(err)
       }
       var user = {
-        profile_id: profile.profile_id,
-        cover_url: url
+        profile_id: profile_id,
+        cover_url: filenameget
       }
       await this.profileRepository.save(user)
 
