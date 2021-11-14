@@ -144,15 +144,13 @@ export class JobsController {
         return this.jobsService.deleteresume(param.application_id)
     }
 
-    @Patch('/job')
+    @Patch('/job/:job_id')
     @UseGuards(AuthGuard('jwt'))
     @ApiOperation({ summary: 'Update job' })
     @ApiParam({ name: 'job_id', required: true, schema: { oneOf: [{ type: 'string' }] } })   
-    UpdateJob(@Body() jobDto:JobsDto): Promise<any> { 
-        // var data={
-        //     status:true
-        // }
-        return this.jobsService.updatejob(jobDto) 
+    UpdateJob(@Param() param,@Body() jobDto:JobsDto): Promise<any> { 
+        console.log("ksddbkjsawhndkndsk")
+        return this.jobsService.updatejob(param.job_id,jobDto) 
     }
 }
 

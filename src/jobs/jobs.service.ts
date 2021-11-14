@@ -53,26 +53,26 @@ export class JobsService {
     }
   }
 
-  async updatejob(data: any): Promise<any> {
-    try {
+  // async updatejob(data: any): Promise<any> {
+  //   try {
 
-      await this.jobsRepository.save(data);
+  //     await this.jobsRepository.save(data);
 
-      return {
-        success: true,
-        message: 'Successfully updated job',
+  //     return {
+  //       success: true,
+  //       message: 'Successfully updated job',
 
-      };
-      // }
+  //     };
+  //     // }
 
-    } catch (err) {
-      console.log('err', err);
-      return {
-        success: false,
-        message: 'job not updated',
-      };
-    }
-  }
+  //   } catch (err) {
+  //     console.log('err', err);
+  //     return {
+  //       success: false,
+  //       message: 'job not updated',
+  //     };
+  //   }
+  // }
   async deletejob(job_id: string): Promise<any> {
     try {
 
@@ -336,22 +336,23 @@ console.log(filename)
     }
   }
 
-  // async updatejob(id: any,data:any): Promise<any> {
-  //   try {
-  //     this.applicationsRepository.createQueryBuilder().update(Applications).set(data).where("application_id = :application_id",{application_id:id}).execute();
-  //         return {
-  //         success: true,
-  //         message: 'Status Changed',
-  //       };
+  async updatejob(id: any,data:any): Promise<any> {
+    try {
+      console.log(data)
+      this.applicationsRepository.createQueryBuilder().update(Jobs).set(data).where("job_id = :job_id",{job_id:id}).execute();
+          return {
+          success: true,
+          message: 'job updated',
+        };
   
 
-  //   } catch (err) {
-  //     console.log('err', err);
-  //     return {
-  //       success: false,
-  //       message: 'Status not changed',
-  //     };
-  //   }
-  // }
+    } catch (err) {
+      console.log('err', err);
+      return {
+        success: false,
+        message: 'Job not changed',
+      };
+    }
+  }
 }
 
