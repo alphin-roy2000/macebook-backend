@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { getManager, Repository } from "typeorm";
 import Profile from './entities/profile.entity';
 import { v4 as uuidv4 } from 'uuid';
 import Connections from './entities/connections.entity';
@@ -20,8 +20,22 @@ export class ProfileService {
     @InjectRepository(Experience)
     private readonly experienceRepository: Repository<Experience>
   ) { }
-  async getProfileDetails(): Promise<any> {
-    const profile = await this.profileRepository.find();
+  async getProfileDetails(key:string): Promise<any> {
+    var sample="";
+    const myArray=key.toLowerCase().split(" ");
+      for(var i=0;i<myArray.length;i++){
+        if(i==myArray.length-1){
+          sample+=`LOWER(fullname) like '%`+myArray[i]+`%' `; 
+        }else{
+          sample+=`LOWER(fullname) like '%`+myArray[i]+`%' or `;
+        }}
+        console.log(sample)
+      const entityManager = getManager();
+      const profile =  await entityManager.query(`
+      SELECT 
+        profile_id, fullname
+      FROM "Profile" where ${sample};
+      `);
     return profile;
   }
   async getProfileDetailsbyKey(key:string): Promise<any> {
