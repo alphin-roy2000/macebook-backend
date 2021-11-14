@@ -72,7 +72,7 @@ export class ProfileService {
   async insertprofile(data: any,profile_id:string): Promise<any> {
     try {
       var skills = data["skills"]
-      data.utype = "student"
+      data.utype = data.utype
       data.profile_id=profile_id
       delete data.skills
       var profile = await this.profileRepository.save(data);
@@ -105,7 +105,7 @@ export class ProfileService {
   async updateprofile(data: any,profile_id:string): Promise<any> {
     try {
       var skills = data["skills"]
-      data.utype = "student"
+      data.utype = data.utype
       data.profile_id=profile_id
       delete data.skills
       var profile = await this.profileRepository.save(data);
@@ -184,6 +184,15 @@ export class ProfileService {
   async uploadprofileimage(profile_id: string, url: string): Promise<any> {
 
     try {
+      var profile = await this.profileRepository.find({profile_id: profile_id})
+      if(profile[0].profile_image_url){
+        try {
+          fs.unlinkSync(`./uploads/profile/${profile[0].profile_image_url}`)
+          //file removed
+        } catch (err) {
+          console.error(err)
+        }
+      }
       var user = {
         profile_id: profile_id,
         profile_image_url: url
@@ -208,6 +217,15 @@ export class ProfileService {
   async uploadcoverimage(profile_id: string, url: string): Promise<any> {
 
     try {
+      var profile = await this.profileRepository.find({profile_id: profile_id})
+      if(profile[0].cover_url){
+        try {
+          fs.unlinkSync(`./uploads/cover/${profile[0].cover_url}`)
+          //file removed
+        } catch (err) {
+          console.error(err)
+        }
+      }
       var user = {
         profile_id: profile_id,
         cover_url: url
