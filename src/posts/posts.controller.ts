@@ -35,6 +35,8 @@ export class PostsController {
     }
 
     @Get('/:post_id')
+    
+    
     SinglePost(@Param() post_id:string):Promise<any>{
         return this.postservice.getsinglepost(post_id)
     }
@@ -45,7 +47,7 @@ export class PostsController {
         return this.postservice.insertpost(postdto,req.user.uid)
     }
 
-    @Patch('/:post_id/update_post')
+    @Patch('/update_post/:post_id')
     UpdatePost(@Param('post_id') post_id:string,@Body() updatepostdto:UpdatePostDto):Promise<any>{
         return this.postservice.updatepost(post_id,updatepostdto)
     }

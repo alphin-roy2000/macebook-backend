@@ -6,10 +6,7 @@ import Profile from './entities/profile.entity';
 import Connections from './entities/connections.entity';
 import Skills from './entities/skills.entity';
 import Experience from './entities/experience.entity';
-<<<<<<< HEAD
 
-=======
->>>>>>> c23523fbd85235e6a06f1e509872d88aa93f622c
 import { Posts } from 'src/posts/entity/post.entity';
 import { Comments } from 'src/comments/entities/comment.entity';
 import User from 'src/user/entities/user.entity';
