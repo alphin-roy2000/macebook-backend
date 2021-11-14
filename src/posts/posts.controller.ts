@@ -64,6 +64,8 @@ export class PostsController {
 
     @UseGuards(AuthGuard('jwt'))
     @Post('/like/:id')
+    @ApiOperation({ summary: 'Like post ' })
+      @ApiParam({ name: 'post_id', required: true, schema: { oneOf: [{ type: 'string' }] } })
     likepost(@Req() req:RequestWithUser,@Param() params):Promise<any>{
         return this.postservice.likepost(params.id,req.user.uid);
 
@@ -79,7 +81,7 @@ export class PostsController {
         schema: {
           type: 'object',
           properties: {
-            cover: {
+            postimage: {
               type: 'string',
               format: 'binary',
             },
@@ -109,7 +111,7 @@ export class PostsController {
         schema: {
           type: 'object',
           properties: {
-            cover: {
+            postimage: {
               type: 'string',
               format: 'binary',
             },
@@ -139,7 +141,7 @@ export class PostsController {
         schema: {
           type: 'object',
           properties: {
-            cover: {
+            postimage: {
               type: 'string',
               format: 'binary',
             },
