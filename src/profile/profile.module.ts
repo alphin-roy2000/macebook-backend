@@ -6,7 +6,6 @@ import Profile from './entities/profile.entity';
 import Connections from './entities/connections.entity';
 import Skills from './entities/skills.entity';
 import Experience from './entities/experience.entity';
-
 import { Posts } from 'src/posts/entity/post.entity';
 import { Comments } from 'src/comments/entities/comment.entity';
 import User from 'src/user/entities/user.entity';

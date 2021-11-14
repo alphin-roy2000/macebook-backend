@@ -140,7 +140,28 @@ export class ProfileService {
   async deleteprofile(profile_id: string): Promise<any> {
     try {
       console.log(profile_id);
-      await this.profileRepository.delete(profile_id)
+      
+      const profile=await this.profileRepository.find({profile_id:profile_id});
+      
+      if(profile[0].profile_image_url){
+        try {
+          fs.unlinkSync(`./uploads/profile/${profile[0].profile_image_url}`)
+          //file removed
+        } catch (err) {
+          console.error(err)
+        }
+      }
+      if(profile[0].cover_url){
+        try{
+          fs.unlinkSync(`./uploads/cover/${profile[0].cover_url}`)
+          //file removed
+        } catch (err) {
+          console.error(err)
+        }
+      }
+      await this.profileRepository.delete({profile_id:profile_id});
+
+      console.log(profile);
       return {
         success: true,
         message: 'Successfully deleted',
@@ -334,8 +355,8 @@ export class ProfileService {
       } catch (err) {
         console.error(err)
       }
-      var profiledatas = await this.profileRepository.createQueryBuilder().update(Profile).set({ profile_image_url: null }).where("profile_id = :profile_id", { profile_id: profile.profile_id }).execute()
-
+      var profiledatas = await this.profileRepository.createQueryBuilder().update(Profile).set({ profile_image_url: null }).where("profile_id = :profile_id", { profile_id: profiledata.profile_id }).execute()
+console.log(profiledatas)
       return {
         success: true,
         message: 'Successfully deleted profile image',
