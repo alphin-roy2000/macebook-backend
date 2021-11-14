@@ -181,11 +181,13 @@ export class PostsService {
 
   }
 
-  async uploadpostphoto(post: any, image_name: string): Promise<any> {
+  async uploadpostphoto(post: any, image_name: string,user_id:string): Promise<any> {
     try {
+      const profile=await this.profilerepository.findOne({where:{profile_id:user_id}});
       var user = {
         post_id: post.post_id,
-        post_image_name: image_name
+        post_image_name: image_name,
+        profile:profile
       }
       await this.postrepository.save(user)
       return {

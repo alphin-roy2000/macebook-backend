@@ -65,7 +65,7 @@ export class PostsController {
     @UseGuards(AuthGuard('jwt'))
     @Post('/like/:id')
     @ApiOperation({ summary: 'Like post ' })
-      @ApiParam({ name: 'post_id', required: true, schema: { oneOf: [{ type: 'string' }] } })
+      @ApiParam({ name: 'id', required: true, schema: { oneOf: [{ type: 'string' }] } })
     likepost(@Req() req:RequestWithUser,@Param() params):Promise<any>{
         return this.postservice.likepost(params.id,req.user.uid);
 
@@ -97,8 +97,8 @@ export class PostsController {
               }
           })
       }))
-      uploadImage(@Param() post_id: string, @UploadedFile() file: Express.Multer.File, @Req() req: any) {
-        return this.postservice.uploadpostphoto(post_id, file.filename);
+      uploadImage(@Param() post_id: string, @UploadedFile() file: Express.Multer.File, @Req() req: RequestWithUser) {
+        return this.postservice.uploadpostphoto(post_id, file.filename,req.user.uid);
       }
 
       // UPDATE POST IMAGE
