@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import Connections from './entities/connections.entity';
 import Skills from './entities/skills.entity';
 import Experience from './entities/experience.entity';
+import { StringDecoder } from 'string_decoder';
 
 const fs = require('fs')
 @Injectable()
@@ -43,9 +44,33 @@ export class ProfileService {
     var profile;
     return profile;
   }
-  async getOneprofileDetail(profile_id: string): Promise<any> {
+  async getOneprofileDetail(profile_id: string,my_id:string): Promise<any> {
     var profile = await this.profileRepository.createQueryBuilder("profile").leftJoin("profile.skills", "skills").addSelect("skills.skill").leftJoinAndSelect("profile.experience", "experience").where("profile.profile_id = :profile_id", { profile_id: profile_id }).getOne()
-    return profile;
+    if(my_id!=null){
+      if(my_id===profile_id)
+      var connection_status="me";
+      else{
+        var conn = await this.connectionRepository.createQueryBuilder("connection").leftJoin("connection.connection_memberid","cmember_id").addSelect("cmember_id.profile_id").where("connection.connection_memberid=:my_id and connection.member_id=:profile_id  or connection.connection_memberid=:profile_id and connection.member_id=:my_id  ",{ my_id:my_id,profile_id: profile_id}).getOne()
+        if(conn!=null){
+          if(conn.status=== 'connect'){
+            var connection_status="connected";
+          }
+          else{
+            if(conn.connection_memberid.profile_id===my_id)
+              var connection_status="Invited";
+            else
+              var connection_status="Accept";
+          }
+        }
+        else
+          var connection_status="connect";
+      }
+    }else{
+      console.log("what just happened: Error is at getOneprofileDetail service function");
+    }
+    return {profile:profile,
+    
+    connection_status:connection_status};
   }
 
   async insertprofile(data: any,profile_id:string): Promise<any> {
@@ -493,7 +518,7 @@ export class ProfileService {
       try {
         var user_details = await this.profileRepository.findOne(user.id)
         var current_User_details = await this.profileRepository.findOne(current_User)
-        await this.connectionRepository.createQueryBuilder().delete().where({ connected_profile: user_details, profile: current_User_details, status: "invite" }).execute()
+        await this.connectionRepository.createQueryBuilder().delete().where({ member_id: user_details, connection_memberid: current_User_details, status: "invite" }).execute()
         return {
           success: true,
           message: 'Cancelled',
