@@ -45,7 +45,7 @@ export class ProfileService {
   }
   async getOneprofileDetail(profile_id: string,my_id:string): Promise<any> {
     var profile = await this.profileRepository.createQueryBuilder("profile").leftJoin("profile.skills", "skills").addSelect("skills.skill").leftJoinAndSelect("profile.experience", "experience").where("profile.profile_id = :profile_id", { profile_id: profile_id }).getOne()
-    if(my_id!=null){
+
       if(my_id===profile_id)
       var connection_status="me";
       else{
@@ -64,9 +64,6 @@ export class ProfileService {
         else
           var connection_status="connect";
       }
-    }else{
-      console.log("what just happened: Error is at getOneprofileDetail service function");
-    }
     return {profile:profile,
     
     connection_status:connection_status};
