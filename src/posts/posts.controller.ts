@@ -35,7 +35,8 @@ export class PostsController {
     }
 
     @Get('/:post_id')
-    
+    @ApiOperation({ summary: 'Search Post' })
+    @ApiParam({ name: 'post_id', required: true, schema: { oneOf: [{ type: 'string' }] } }) 
     
     SinglePost(@Param() post_id:string):Promise<any>{
         return this.postservice.getsinglepost(post_id)
@@ -58,7 +59,7 @@ export class PostsController {
     }
 
     @UseGuards(AuthGuard('jwt'))
-    @Post('/like:id')
+    @Post('/like/:id')
     likepost(@Req() req:RequestWithUser,@Param() params):Promise<any>{
         return this.postservice.likepost(params.id,req.user.uid);
 
@@ -68,7 +69,7 @@ export class PostsController {
       @UseGuards(AuthGuard('jwt'))
       @Post('/picture/:post_id')
       @ApiOperation({ summary: 'Upload post image' })
-  // @ApiParam({ name: 'profile_id', required: true, schema: { oneOf: [{ type: 'string' }] } })
+      @ApiParam({ name: 'post_id', required: true, schema: { oneOf: [{ type: 'string' }] } })
      @ApiConsumes('multipart/form-data')
       @ApiBody({
         schema: {
@@ -98,7 +99,7 @@ export class PostsController {
       @UseGuards(AuthGuard('jwt'))
       @Patch('/picture/:post_id')
       @ApiOperation({ summary: 'Update post image' })
-  // @ApiParam({ name: 'profile_id', required: true, schema: { oneOf: [{ type: 'string' }] } })
+      @ApiParam({ name: 'post_id', required: true, schema: { oneOf: [{ type: 'string' }] } })
      @ApiConsumes('multipart/form-data')
       @ApiBody({
         schema: {
@@ -128,7 +129,7 @@ export class PostsController {
       @UseGuards(AuthGuard('jwt'))
       @Delete('/picture/:post_id')
       @ApiOperation({ summary: 'delete post image' })
-  // @ApiParam({ name: 'profile_id', required: true, schema: { oneOf: [{ type: 'string' }] } })
+      @ApiParam({ name: 'post_id', required: true, schema: { oneOf: [{ type: 'string' }] } })
      @ApiConsumes('multipart/form-data')
       @ApiBody({
         schema: {

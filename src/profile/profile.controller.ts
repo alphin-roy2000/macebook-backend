@@ -83,7 +83,7 @@ export class ProfileController {
       properties: {
         profilepicture: {
           type: 'string',
-          format: 'jpg',
+          format: 'binary',
         },
       },
     },
