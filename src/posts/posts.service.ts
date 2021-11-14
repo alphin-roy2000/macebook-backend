@@ -75,7 +75,7 @@ export class PostsService {
       //const post = await this.postRepository.findOne(post_id)
       const user = await this.userrepository.findOne({ where: { uid: user_id } })
       console.log(user)
-      const profile = await this.profilerepository.findOne({ where: { profile_id: '0a499666-75ec-42f3-9bf1-b1a8c978dabd' } })
+      const profile = await this.profilerepository.findOne({ where: { profile_id: user_id } })
       console.log(profile)
       const { topic, text } = data;
       const post = this.postrepository.create({

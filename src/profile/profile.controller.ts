@@ -36,8 +36,9 @@ export class ProfileController {
   @Get('/p1/:id')
   @ApiOperation({ summary: 'Get Profile by id' })
   @ApiParam({ name: 'id', required: true, schema: { oneOf: [{ type: 'string' }] } })
-  FindOneProfile(@Param() param:any): Promise<any> {
-    return this.profileService.getOneprofileDetail(param.id)
+  FindOneProfile(@Param() param:any,@Body() body:any): Promise<any> {
+
+    return this.profileService.getOneprofileDetail(param.id,body.id)
   }
   //     @Get('/p2/:profile_id')
   //     @ApiOperation({ summary: 'Get Profile by id' })
