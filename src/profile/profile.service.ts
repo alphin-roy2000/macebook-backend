@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { getManager, Repository } from "typeorm";
 import Profile from './entities/profile.entity';
 import { v4 as uuidv4 } from 'uuid';
 import Connections from './entities/connections.entity';
@@ -20,8 +20,22 @@ export class ProfileService {
     @InjectRepository(Experience)
     private readonly experienceRepository: Repository<Experience>
   ) { }
-  async getProfileDetails(): Promise<any> {
-    const profile = await this.profileRepository.find();
+  async getProfileDetails(key:string): Promise<any> {
+    var sample="";
+    const myArray=key.toLowerCase().split(" ");
+      for(var i=0;i<myArray.length;i++){
+        if(i==myArray.length-1){
+          sample+=`LOWER(fullname) like '%`+myArray[i]+`%' `; 
+        }else{
+          sample+=`LOWER(fullname) like '%`+myArray[i]+`%' or `;
+        }}
+        console.log(sample)
+      const entityManager = getManager();
+      const profile =  await entityManager.query(`
+      SELECT 
+        profile_id, fullname
+      FROM "Profile" where ${sample};
+      `);
     return profile;
   }
   async getProfileDetailsbyKey(key:string): Promise<any> {
@@ -400,7 +414,7 @@ export class ProfileService {
 
     if (user.id != current_User) {
       try {
-        // console.log(user)
+        console.log(user)
         // console.log(current_User)
         var user_details = await this.profileRepository.findOne(user.id)
         var current_User_details = await this.profileRepository.findOne(current_User)
@@ -453,8 +467,8 @@ export class ProfileService {
       try {
         var user_details = await this.profileRepository.findOne(user.id)
         var current_User_details = await this.profileRepository.findOne(current_User)
-        await this.connectionRepository.createQueryBuilder().delete().where({ connected_profile: current_User_details, profile: user_details, status: "connected" }).execute()
-        await this.connectionRepository.createQueryBuilder().delete().where({ connected_profile: user_details, profile: current_User_details, status: "connected" }).execute()
+        var stu1=await this.connectionRepository.createQueryBuilder().delete().where({ member_id: current_User_details, connection_memberid: user_details, status: "connected" }).execute()
+        var stu2=await this.connectionRepository.createQueryBuilder().delete().where({ member_id: user_details, connection_memberid: current_User_details, status: "connected" }).execute()
         return {
           success: true,
           message: 'Disconnected',
