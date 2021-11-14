@@ -6,7 +6,6 @@ import { v4 as uuidv4 } from 'uuid';
 import Connections from './entities/connections.entity';
 import Skills from './entities/skills.entity';
 import Experience from './entities/experience.entity';
-import { StringDecoder } from 'string_decoder';
 
 const fs = require('fs')
 @Injectable()
