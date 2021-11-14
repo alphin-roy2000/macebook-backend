@@ -20,21 +20,25 @@ export class PostsController {
     }
 
     @Get()
+    @UseGuards(AuthGuard('jwt'))
     getallposts():Promise<any>{
         return this.postservice.getallposts();
     }
 
     @Get('/search')
+    @UseGuards(AuthGuard('jwt'))
     searchpost(@Query() topicdto:GetPostByTopic):Promise<any>{
         return this.postservice.searchpost(topicdto)
     }
 
     @Get('/topic')
+    @UseGuards(AuthGuard('jwt'))
     getpostbytopic(@Query() topicdto:GetPostByTopic):Promise<any>{
         return this.postservice.getpostbytopic(topicdto)
     }
 
     @Get('/:post_id')
+    @UseGuards(AuthGuard('jwt'))
     @ApiOperation({ summary: 'Search Post' })
     @ApiParam({ name: 'post_id', required: true, schema: { oneOf: [{ type: 'string' }] } }) 
     
