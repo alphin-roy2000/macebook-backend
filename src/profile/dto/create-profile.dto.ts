@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, MaxLength } from 'class-validator';
+import { IsString, MaxLength, ValidateNested } from 'class-validator';
 import Skills from '../entities/skills.entity';
 
 export class ProfileParameter{
@@ -21,7 +21,7 @@ export class ProfileDto {
     type: 'list',
     example:{admission_no:'B18CS008',branch:'CSE',batch:'2019'}
   })
-  @IsString()
+  @ValidateNested({ each: true })
   readonly admission: { admission_no: string,branch:string, batch: string };
   
   @ApiProperty({
