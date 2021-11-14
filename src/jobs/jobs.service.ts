@@ -197,18 +197,7 @@ export class JobsService {
           success: true,
           message: 'Status Changed',
         };
-  //     await this.applicationsRepository.save(data);
-  //     await this.applicationsRepository.createQueryBuilder()
-	// .update(Applications)
-	// .set({ status: 2 })
-	// .where("jobsjobid = :id", { id: 123 })
-	// .returning("value")
-  //     return {
-  //       success: true,
-  //       message: 'Successfully updated job',
-
-  //     };
-      // }
+  
 
     } catch (err) {
       console.log('err', err);
@@ -346,5 +335,23 @@ console.log(filename)
       };
     }
   }
+
+  // async updatejob(id: any,data:any): Promise<any> {
+  //   try {
+  //     this.applicationsRepository.createQueryBuilder().update(Applications).set(data).where("application_id = :application_id",{application_id:id}).execute();
+  //         return {
+  //         success: true,
+  //         message: 'Status Changed',
+  //       };
+  
+
+  //   } catch (err) {
+  //     console.log('err', err);
+  //     return {
+  //       success: false,
+  //       message: 'Status not changed',
+  //     };
+  //   }
+  // }
 }
 
