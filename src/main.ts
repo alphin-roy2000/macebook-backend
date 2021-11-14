@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { Logger} from '@nestjs/common';
+import { Logger, ValidationPipe} from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { config } from 'dotenv'; config();
 import * as cookieParser from 'cookie-parser';
@@ -28,7 +28,10 @@ async function bootstrap() {
   SwaggerModule.setup('api-doc', app, swaggerDocument);
   logger.log(`Api documentation available at "/api-doc/`);
 
-  
+  app.useGlobalPipes(new ValidationPipe({
+    transform: true,
+    validationError: { target: false },
+  }));
 
   const port = process.env.PORT || 4009;
   await app.listen(port);

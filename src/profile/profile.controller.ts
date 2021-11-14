@@ -12,7 +12,7 @@ import { ConnectionDto } from './dto/connection.dto';
 import { ExperienceDto } from './dto/experience.dto';
 import RequestWithUser from 'src/user/interfaces/requestWithUser.interface';
 import { AuthGuard } from '@nestjs/passport';
-@ApiBearerAuth()
+
 @ApiTags('profile')
 @Controller('api/v1/profile')
 export class ProfileController {
@@ -21,11 +21,13 @@ export class ProfileController {
 
   @Get('/all/:key')
   @ApiOperation({ summary: 'Get All Profile by key' })
+  @ApiParam({ name: 'key', required: true, schema: { oneOf: [{ type: 'string' }] } })
+
   Findprofile(@Param() param: any): Promise<any> {
     return this.profileService.getProfileDetails(param.key)
   }
   @Get('/search/:key')
-  @ApiOperation({ summary: 'Search Profile' })
+  @ApiOperation({ summary: 'Search Profile -don"t use' })
   @ApiParam({ name: 'key', required: true, schema: { oneOf: [{ type: 'string' }] } })
   Searchprofile(@Param() param: any): Promise<any> {
     return this.profileService.getProfileDetails(param.key)
@@ -55,7 +57,6 @@ export class ProfileController {
   @Patch('/updation')
   @ApiOperation({ summary: 'Update Profile' })
   PutProfile(@Body() profileDto: ProfileDto, @Req() req: RequestWithUser) {
-    console.log(req.user.uid)
     return this.profileService.updateprofile(profileDto,req.user.uid);
   }
   @UseGuards(AuthGuard('jwt'))
