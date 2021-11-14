@@ -30,7 +30,7 @@ export class JobsController {
     @Get('/alumni_job/:alumni_id')
     AlumniJob(@Param() param): Promise<any> { 
         return this.jobsService.AlumniJobDetails(param.alumni_id) 
-    }
+    }   
 
     @Post('/add')  
     AddJob(@Body() jobDto:JobsDto): Promise<any> { 
@@ -38,7 +38,7 @@ export class JobsController {
     }
 
     
-    @Post('/application/:job_id')  
+    @Post('/applications/:job_id')  
     @UseInterceptors(FileInterceptor('resume', {
         storage: diskStorage({
             destination: './uploads/resume',
@@ -71,19 +71,26 @@ export class JobsController {
         return this.jobsService.ChangeStatus(param.application_id ,data) 
     }
 
-
-    @Patch("hgjgf")
-    PutJob(@Body() jobDto:JobsDto):Promise<any>{
-        return this.jobsService.updatejob(jobDto);
+    @Get('/resume/:application_id')
+    GetResume(@Param() param): Promise<any> { 
+        return this.jobsService.selectresume(param.application_id) 
     }
 
-    @Delete('/:job_id')
+    
+    @Delete('j/:job_id')
     DeleteoneJob(@Param() job_id:string):Promise<any> { 
         return this.jobsService.deletejob(job_id) 
     }
 
+    @Delete('/applications/:application_id')
+    DeleteApplication(@Param() param):Promise<any>{
+        console.log(param.application_id)
+        return this.jobsService.deleteapplication(param.application_id)
+    }
 
-
-
+    @Delete('/resume/:application_id')
+    DeleteResume(@Param() param):Promise<any>{
+        return this.jobsService.deleteresume(param.application_id)
+    }
 }
 
