@@ -12,7 +12,7 @@ import { ConnectionDto } from './dto/connection.dto';
 import { ExperienceDto } from './dto/experience.dto';
 import RequestWithUser from 'src/user/interfaces/requestWithUser.interface';
 import { AuthGuard } from '@nestjs/passport';
-@ApiBearerAuth()
+
 @ApiTags('profile')
 @Controller('api/v1/profile')
 export class ProfileController {
