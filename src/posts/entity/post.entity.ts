@@ -23,8 +23,7 @@ export class Posts {
     @CreateDateColumn()
     createdDate:Date;
 
-    @Column()
-    topic:string;
+
 
     @Column({ length:512 })
     text:string;

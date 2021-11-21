@@ -77,9 +77,9 @@ export class PostsService {
       console.log(user)
       const profile = await this.profilerepository.findOne({ where: { profile_id: user_id } })
       console.log(profile)
-      const { topic, text } = data;
+      const { text } = data;
       const post = this.postrepository.create({
-        topic,
+        
         text,
         likes: [],
         comments: [],
@@ -114,9 +114,9 @@ export class PostsService {
   async updatepost(post_id: string, updatepostdto: UpdatePostDto): Promise<any> {
     console.log(updatepostdto);
     try {
-      const { topic, text } = updatepostdto;
+      const {  text } = updatepostdto;
       const post = await this.getsinglepost(post_id);
-      post.topic = topic;
+      
       post.text = text;
       await this.postrepository.save(post);
 
