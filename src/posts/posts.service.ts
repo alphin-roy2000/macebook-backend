@@ -74,6 +74,7 @@ export class PostsService {
     try {
       //const post = await this.postRepository.findOne(post_id)
       const user = await this.userrepository.findOne({ where: { uid: user_id } })
+      const name=user.username
       console.log(user)
       const profile = await this.profilerepository.findOne({ where: { profile_id: user_id } })
       console.log(profile)
@@ -87,12 +88,14 @@ export class PostsService {
 
       })
       post.profile = profile;
+      post.post_username=name
 
       console.log(post)
 
       await this.postrepository.save(post);
       return {
         post,
+        
         sucess: true,
         message: 'post ids uploded',
       };

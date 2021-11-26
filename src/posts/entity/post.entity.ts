@@ -31,8 +31,12 @@ export class Posts {
     @Column({ type: 'simple-array' })
     likes: string[];
 
-    @Column({ nullable: true })
+    @Column({nullable:true  })
     post_image_name: string;
+
+    @Column({nullable:true})
+    post_username:string
+
 
 
     //Post-Comment(AR)
