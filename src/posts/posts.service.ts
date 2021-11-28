@@ -113,7 +113,50 @@ export class PostsService {
 
 
   }
+  async insertpost2(data: PostsDto, user_id: string,filename:string): Promise<any> {
+    console.log(data)
+    try {
+      //const post = await this.postRepository.findOne(post_id)
+      const user = await this.userrepository.findOne({ where: { uid: user_id } })
+      const name=user.username
+      console.log(user)
+      const profile = await this.profilerepository.findOne({ where: { profile_id: user_id } })
+      console.log(profile)
+      const { text } = data;
+      const post = this.postrepository.create({
+        
+        text,
+        likes: [],
+        comments: [],
 
+
+      })
+      post.profile = profile;
+      post.post_username=name
+      post.post_image_name=filename;
+      console.log(post)
+
+      await this.postrepository.save(post);
+      return {
+        post,
+        
+        sucess: true,
+        message: 'post ids uploded',
+      };
+    } catch (err) {
+      console.log(err, 'err');
+      return {
+        sucess: true,
+        message: 'post is uploaded'
+      };
+
+    }
+
+
+
+
+
+  }
   async updatepost(post_id: string, updatepostdto: UpdatePostDto): Promise<any> {
     console.log(updatepostdto);
     try {
